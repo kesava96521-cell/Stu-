@@ -232,13 +232,97 @@
 
     .home-content {
       text-align: center;
-      padding-top: 40px;
+      padding-top: 30px;
       color: #555;
     }
 
     .home-content h2 {
       color: #1a237e;
       margin-bottom: 10px;
+    }
+
+    /* Total Students Box */
+    .total-box {
+      background: white;
+      border-radius: 14px;
+      padding: 22px 18px;
+      margin-top: 25px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+      cursor: pointer;
+      border: 1.5px solid #e8eaf6;
+      transition: 0.2s;
+    }
+
+    .total-box:hover {
+      border-color: #1a237e;
+      background: #f8f9ff;
+    }
+
+    .total-box h3 {
+      color: #1a237e;
+      font-size: 16px;
+      margin-bottom: 6px;
+    }
+
+    .total-box p {
+      color: #666;
+      font-size: 13px;
+    }
+
+    .total-count {
+      font-size: 28px;
+      font-weight: 700;
+      color: #1a237e;
+      margin-top: 8px;
+    }
+
+    /* Students Table */
+    .students-table-box {
+      display: none;
+      margin-top: 20px;
+    }
+
+    .students-table-box.show {
+      display: block;
+    }
+
+    .students-table {
+      width: 100%;
+      border-collapse: collapse;
+      background: white;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+      font-size: 13px;
+    }
+
+    .students-table th {
+      background: #1a237e;
+      color: white;
+      padding: 12px 10px;
+      text-align: left;
+      font-weight: 600;
+    }
+
+    .students-table td {
+      padding: 11px 10px;
+      border-bottom: 1px solid #f0f0f0;
+      color: #333;
+    }
+
+    .students-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .students-table tr:nth-child(even) {
+      background: #fafafa;
+    }
+
+    .no-data {
+      text-align: center;
+      color: #999;
+      padding: 30px 10px;
+      font-size: 14px;
     }
 
     /* Profile Card */
@@ -567,10 +651,33 @@
           <div class="home-content">
             <h2>Welcome 👋</h2>
             <p id="welcomeText">You are logged in successfully.</p>
+
+            <!-- Total Students Box -->
+            <div class="total-box" id="totalStudentsBox">
+              <h3>To see total students</h3>
+              <p>Click to view uploaded students list</p>
+              <div class="total-count" id="totalCount">0</div>
+            </div>
+
+            <!-- Students Table (hidden by default) -->
+            <div class="students-table-box" id="studentsTableBox">
+              <table class="students-table">
+                <thead>
+                  <tr>
+                    <th>S.No</th>
+                    <th>Roll Number</th>
+                    <th>Name</th>
+                  </tr>
+                </thead>
+                <tbody id="studentsTableBody">
+                </tbody>
+              </table>
+              <div class="no-data" id="noDataMsg" style="display:none;">No students data uploaded yet</div>
+            </div>
           </div>
         </div>
 
-        <!-- STUDENT TAB (NO CHATBOT) -->
+        <!-- STUDENT TAB -->
         <div id="studentTab" class="hidden">
           <div class="student-welcome">
             <h2>Welcome to Students Tracker</h2>
@@ -599,7 +706,7 @@
           </div>
 
           <div class="upload-success" id="uploadSuccess">
-            ✅ File uploaded successfully!
+            ✅ File uploaded & saved successfully!
           </div>
         </div>
 
@@ -696,7 +803,15 @@
     const fileInput = document.getElementById('fileInput');
     const uploadSuccess = document.getElementById('uploadSuccess');
 
+    // Home table elements
+    const totalStudentsBox = document.getElementById('totalStudentsBox');
+    const totalCount = document.getElementById('totalCount');
+    const studentsTableBox = document.getElementById('studentsTableBox');
+    const studentsTableBody = document.getElementById('studentsTableBody');
+    const noDataMsg = document.getElementById('noDataMsg');
+
     let currentUser = null;
+    let currentUploadType = '';
 
     // ========== LOGIN PASSWORD TOGGLE ==========
     togglePassword.addEventListener('click', function () {
@@ -773,6 +888,7 @@
       appScreen.classList.add('active');
 
       showHome();
+      updateTotalCount();
 
       if (currentUser) {
         document.getElementById('welcomeText').textContent = 
@@ -798,6 +914,7 @@
       tabStudent.classList.remove('active');
       tabProfile.classList.remove('active');
       appHeader.textContent = "Home";
+      updateTotalCount();
     }
 
     function showStudent() {
@@ -809,7 +926,6 @@
       tabProfile.classList.remove('active');
       appHeader.textContent = "Student";
 
-      // Reset upload UI
       fileUploadBox.classList.remove('show');
       uploadSuccess.style.display = 'none';
       fileInput.value = '';
@@ -829,8 +945,46 @@
     tabStudent.addEventListener('click', showStudent);
     tabProfile.addEventListener('click', showProfile);
 
+    // ========== HOME - TOTAL STUDENTS ==========
+    function getUploadedStudents() {
+      try {
+        return JSON.parse(localStorage.getItem('uploadedStudents') || '[]');
+      } catch (e) {
+        return [];
+      }
+    }
+
+    function updateTotalCount() {
+      const list = getUploadedStudents();
+      totalCount.textContent = list.length;
+    }
+
+    totalStudentsBox.addEventListener('click', function() {
+      const list = getUploadedStudents();
+      studentsTableBody.innerHTML = '';
+
+      if (list.length === 0) {
+        noDataMsg.style.display = 'block';
+        studentsTableBox.classList.add('show');
+        return;
+      }
+
+      noDataMsg.style.display = 'none';
+      list.forEach((stu, index) => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${index + 1}</td>
+          <td>${stu.rollNumber || '—'}</td>
+          <td>${stu.name || '—'}</td>
+        `;
+        studentsTableBody.appendChild(tr);
+      });
+      studentsTableBox.classList.add('show');
+    });
+
     // ========== UPLOAD OPTIONS ==========
     btnPdf.addEventListener('click', function() {
+      currentUploadType = 'pdf';
       fileUploadText.textContent = 'Select a PDF file';
       fileInput.accept = '.pdf';
       fileUploadBox.classList.add('show');
@@ -838,6 +992,7 @@
     });
 
     btnExcel.addEventListener('click', function() {
+      currentUploadType = 'excel';
       fileUploadText.textContent = 'Select an Excel / CSV file';
       fileInput.accept = '.xlsx,.xls,.csv';
       fileUploadBox.classList.add('show');
@@ -845,6 +1000,7 @@
     });
 
     btnImage.addEventListener('click', function() {
+      currentUploadType = 'image';
       fileUploadText.textContent = 'Select Photo / Image';
       fileInput.accept = 'image/*';
       fileUploadBox.classList.add('show');
@@ -852,10 +1008,64 @@
     });
 
     fileInput.addEventListener('change', function() {
-      if (this.files && this.files[0]) {
+      if (!this.files || !this.files[0]) return;
+
+      const file = this.files[0];
+
+      if (currentUploadType === 'excel') {
+        // Parse Excel and save Roll Number + Name
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          try {
+            const data = new Uint8Array(e.target.result);
+            const workbook = XLSX.read(data, { type: 'array' });
+            const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+            const jsonData = XLSX.utils.sheet_to_json(firstSheet, { header: 1 });
+
+            // Try to find Roll Number and Name columns
+            let studentsList = [];
+            if (jsonData.length > 1) {
+              // Assume first row is header
+              const headers = jsonData[0].map(h => String(h).toLowerCase());
+              let rollIdx = headers.findIndex(h => h.includes('roll'));
+              let nameIdx = headers.findIndex(h => h.includes('name'));
+
+              // Fallback if not found
+              if (rollIdx === -1) rollIdx = 0;
+              if (nameIdx === -1) nameIdx = 1;
+
+              for (let i = 1; i < jsonData.length; i++) {
+                const row = jsonData[i];
+                if (row && (row[rollIdx] || row[nameIdx])) {
+                  studentsList.push({
+                    rollNumber: String(row[rollIdx] || '').trim(),
+                    name: String(row[nameIdx] || '').trim()
+                  });
+                }
+              }
+            }
+
+            // Save to localStorage (SQL-like)
+            localStorage.setItem('uploadedStudents', JSON.stringify(studentsList));
+            updateTotalCount();
+
+            uploadSuccess.style.display = 'block';
+            uploadSuccess.textContent = `✅ ${studentsList.length} students saved successfully!`;
+            fileUploadBox.classList.remove('show');
+          } catch (err) {
+            alert('Error reading Excel file');
+            console.error(err);
+          }
+        };
+        reader.readAsArrayBuffer(file);
+      } else {
+        // PDF or Image - for now just show success (real OCR needs backend)
         uploadSuccess.style.display = 'block';
+        uploadSuccess.textContent = '✅ File received! (Full extraction needs backend)';
         fileUploadBox.classList.remove('show');
       }
+
+      this.value = '';
     });
 
     // ========== LOGOUT ==========
