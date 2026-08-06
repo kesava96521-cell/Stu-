@@ -360,6 +360,133 @@
       height: 24px;
       fill: currentColor;
     }
+
+    /* ========== CHATBOT STYLES ========== */
+    .chat-container {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      min-height: 420px;
+    }
+
+    .chat-messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 10px 0;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .bot-msg, .user-msg {
+      max-width: 85%;
+      padding: 12px 14px;
+      border-radius: 14px;
+      font-size: 14px;
+      line-height: 1.45;
+    }
+
+    .bot-msg {
+      background: white;
+      color: #333;
+      align-self: flex-start;
+      border-bottom-left-radius: 4px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+    }
+
+    .user-msg {
+      background: #1a237e;
+      color: white;
+      align-self: flex-end;
+      border-bottom-right-radius: 4px;
+    }
+
+    .chat-options {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .chat-option-btn {
+      background: #e8eaf6;
+      color: #1a237e;
+      border: 1.5px solid #c5cae9;
+      border-radius: 10px;
+      padding: 11px 14px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      text-align: left;
+      transition: 0.2s;
+    }
+
+    .chat-option-btn:hover {
+      background: #1a237e;
+      color: white;
+      border-color: #1a237e;
+    }
+
+    .chat-input-area {
+      display: flex;
+      gap: 8px;
+      margin-top: 12px;
+      padding-top: 10px;
+      border-top: 1px solid #e0e0e0;
+    }
+
+    .chat-input-area input {
+      flex: 1;
+      padding: 11px 14px;
+      border-radius: 20px;
+      border: 1.5px solid #ddd;
+      font-size: 14px;
+      background: white;
+    }
+
+    .chat-send-btn {
+      background: #1a237e;
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 42px;
+      height: 42px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    .chat-send-btn svg {
+      width: 20px;
+      height: 20px;
+      fill: white;
+    }
+
+    .upload-area {
+      margin-top: 12px;
+      padding: 16px;
+      border: 2px dashed #c5cae9;
+      border-radius: 12px;
+      text-align: center;
+      background: #f8f9ff;
+      display: none;
+    }
+
+    .upload-area.show {
+      display: block;
+    }
+
+    .upload-area p {
+      font-size: 13px;
+      color: #555;
+      margin-bottom: 10px;
+    }
+
+    .upload-area input[type="file"] {
+      font-size: 13px;
+    }
   </style>
 </head>
 <body>
@@ -479,11 +606,24 @@
           </div>
         </div>
 
-        <!-- STUDENT TAB -->
+        <!-- STUDENT TAB = CHATBOT -->
         <div id="studentTab" class="hidden">
-          <div class="home-content">
-            <h2>Student</h2>
-            <p>Student section coming soon...</p>
+          <div class="chat-container">
+            <div class="chat-messages" id="chatMessages">
+              <!-- messages will be added here -->
+            </div>
+
+            <div class="upload-area" id="uploadArea">
+              <p id="uploadText">Select your file</p>
+              <input type="file" id="fileInput" accept=".pdf,.xlsx,.xls,.csv,image/*">
+            </div>
+
+            <div class="chat-input-area">
+              <input type="text" id="chatInput" placeholder="Type here..." disabled>
+              <button class="chat-send-btn" id="chatSendBtn" disabled>
+                <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+              </button>
+            </div>
           </div>
         </div>
 
@@ -571,7 +711,16 @@
     const tabProfile = document.getElementById('tabProfile');
     const logoutBtn = document.getElementById('logoutBtn');
 
+    // Chat elements
+    const chatMessages = document.getElementById('chatMessages');
+    const chatInput = document.getElementById('chatInput');
+    const chatSendBtn = document.getElementById('chatSendBtn');
+    const uploadArea = document.getElementById('uploadArea');
+    const uploadText = document.getElementById('uploadText');
+    const fileInput = document.getElementById('fileInput');
+
     let currentUser = null;
+    let chatStarted = false;
 
     // ========== LOGIN PASSWORD TOGGLE ==========
     togglePassword.addEventListener('click', function () {
@@ -683,6 +832,12 @@
       tabStudent.classList.add('active');
       tabProfile.classList.remove('active');
       appHeader.textContent = "Student";
+
+      // Start chatbot only once
+      if (!chatStarted) {
+        startChatbot();
+        chatStarted = true;
+      }
     }
 
     function showProfile() {
@@ -699,9 +854,97 @@
     tabStudent.addEventListener('click', showStudent);
     tabProfile.addEventListener('click', showProfile);
 
+    // ========== CHATBOT ==========
+    function addBotMessage(text, showOptions = false) {
+      const div = document.createElement('div');
+      div.className = 'bot-msg';
+      div.innerHTML = text;
+
+      if (showOptions) {
+        const optionsDiv = document.createElement('div');
+        optionsDiv.className = 'chat-options';
+        optionsDiv.innerHTML = `
+          <button class="chat-option-btn" data-type="pdf">📄 PDF File</button>
+          <button class="chat-option-btn" data-type="excel">📊 Excel File</button>
+          <button class="chat-option-btn" data-type="image">🖼️ Image File</button>
+        `;
+        div.appendChild(optionsDiv);
+
+        // Option click handlers
+        optionsDiv.querySelectorAll('.chat-option-btn').forEach(btn => {
+          btn.addEventListener('click', function() {
+            const type = this.getAttribute('data-type');
+            handleUploadChoice(type);
+          });
+        });
+      }
+
+      chatMessages.appendChild(div);
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    function addUserMessage(text) {
+      const div = document.createElement('div');
+      div.className = 'user-msg';
+      div.textContent = text;
+      chatMessages.appendChild(div);
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    function startChatbot() {
+      chatMessages.innerHTML = '';
+      setTimeout(() => {
+        addBotMessage("Hi! 👋 I'm your Student Data Assistant.");
+      }, 300);
+      setTimeout(() => {
+        addBotMessage("How would you like to upload students data?", true);
+      }, 900);
+    }
+
+    function handleUploadChoice(type) {
+      let label = '';
+      let accept = '';
+
+      if (type === 'pdf') {
+        label = 'PDF File';
+        accept = '.pdf';
+        uploadText.textContent = 'Select a PDF file';
+      } else if (type === 'excel') {
+        label = 'Excel File';
+        accept = '.xlsx,.xls,.csv';
+        uploadText.textContent = 'Select an Excel / CSV file';
+      } else {
+        label = 'Image File';
+        accept = 'image/*';
+        uploadText.textContent = 'Select an Image file';
+      }
+
+      addUserMessage(label);
+      fileInput.accept = accept;
+      uploadArea.classList.add('show');
+
+      setTimeout(() => {
+        addBotMessage("Please select your " + label + " using the upload box below.");
+      }, 400);
+    }
+
+    // File selected
+    fileInput.addEventListener('change', function() {
+      if (this.files && this.files[0]) {
+        const fileName = this.files[0].name;
+        addUserMessage("Uploaded: " + fileName);
+        setTimeout(() => {
+          addBotMessage("✅ File received successfully!<br>Processing will be available soon.");
+        }, 600);
+        uploadArea.classList.remove('show');
+        this.value = '';
+      }
+    });
+
     // ========== LOGOUT ==========
     logoutBtn.addEventListener('click', function () {
       currentUser = null;
+      chatStarted = false;
       appScreen.classList.remove('active');
       loginBox.classList.remove('hidden');
       switchBox.classList.remove('hidden');
