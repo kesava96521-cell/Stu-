@@ -361,112 +361,67 @@
       fill: currentColor;
     }
 
-    /* ========== CHATBOT STYLES ========== */
-    .chat-container {
-      display: flex;
-      flex-direction: column;
-      height: 100%;
-      min-height: 420px;
+    /* ========== STUDENT UPLOAD SCREEN ========== */
+    .student-welcome {
+      text-align: center;
+      padding-top: 20px;
     }
 
-    .chat-messages {
-      flex: 1;
-      overflow-y: auto;
-      padding: 10px 0;
+    .student-welcome h2 {
+      color: #1a237e;
+      font-size: 22px;
+      margin-bottom: 8px;
+    }
+
+    .student-welcome p {
+      color: #666;
+      font-size: 14px;
+      margin-bottom: 28px;
+      line-height: 1.5;
+    }
+
+    .upload-title {
+      text-align: center;
+      font-size: 15px;
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 18px;
+    }
+
+    .upload-options {
       display: flex;
       flex-direction: column;
       gap: 12px;
     }
 
-    .bot-msg, .user-msg {
-      max-width: 85%;
-      padding: 12px 14px;
-      border-radius: 14px;
-      font-size: 14px;
-      line-height: 1.45;
-    }
-
-    .bot-msg {
+    .upload-option-btn {
       background: white;
-      color: #333;
-      align-self: flex-start;
-      border-bottom-left-radius: 4px;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.06);
-    }
-
-    .user-msg {
-      background: #1a237e;
-      color: white;
-      align-self: flex-end;
-      border-bottom-right-radius: 4px;
-    }
-
-    .chat-options {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      margin-top: 8px;
-    }
-
-    .chat-option-btn {
-      background: #e8eaf6;
-      color: #1a237e;
-      border: 1.5px solid #c5cae9;
-      border-radius: 10px;
-      padding: 11px 14px;
-      font-size: 14px;
+      border: 1.5px solid #e0e0e0;
+      border-radius: 12px;
+      padding: 16px 18px;
+      font-size: 15px;
       font-weight: 600;
+      color: #1a237e;
       cursor: pointer;
-      text-align: left;
-      transition: 0.2s;
-    }
-
-    .chat-option-btn:hover {
-      background: #1a237e;
-      color: white;
-      border-color: #1a237e;
-    }
-
-    .chat-input-area {
-      display: flex;
-      gap: 8px;
-      margin-top: 12px;
-      padding-top: 10px;
-      border-top: 1px solid #e0e0e0;
-    }
-
-    .chat-input-area input {
-      flex: 1;
-      padding: 11px 14px;
-      border-radius: 20px;
-      border: 1.5px solid #ddd;
-      font-size: 14px;
-      background: white;
-    }
-
-    .chat-send-btn {
-      background: #1a237e;
-      color: white;
-      border: none;
-      border-radius: 50%;
-      width: 42px;
-      height: 42px;
       display: flex;
       align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      flex-shrink: 0;
+      gap: 12px;
+      transition: 0.2s;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
     }
 
-    .chat-send-btn svg {
-      width: 20px;
-      height: 20px;
-      fill: white;
+    .upload-option-btn:hover {
+      border-color: #1a237e;
+      background: #f5f7ff;
     }
 
-    .upload-area {
-      margin-top: 12px;
-      padding: 16px;
+    .upload-option-btn span {
+      font-size: 22px;
+    }
+
+    .file-upload-box {
+      margin-top: 20px;
+      padding: 18px;
       border: 2px dashed #c5cae9;
       border-radius: 12px;
       text-align: center;
@@ -474,18 +429,27 @@
       display: none;
     }
 
-    .upload-area.show {
+    .file-upload-box.show {
       display: block;
     }
 
-    .upload-area p {
+    .file-upload-box p {
       font-size: 13px;
       color: #555;
-      margin-bottom: 10px;
+      margin-bottom: 12px;
     }
 
-    .upload-area input[type="file"] {
+    .file-upload-box input[type="file"] {
       font-size: 13px;
+    }
+
+    .upload-success {
+      margin-top: 16px;
+      text-align: center;
+      color: #2e7d32;
+      font-weight: 600;
+      font-size: 14px;
+      display: none;
     }
   </style>
 </head>
@@ -606,22 +570,36 @@
           </div>
         </div>
 
-        <!-- STUDENT TAB = CHATBOT -->
+        <!-- STUDENT TAB (NO CHATBOT) -->
         <div id="studentTab" class="hidden">
-          <div class="chat-container">
-            <div class="chat-messages" id="chatMessages"></div>
+          <div class="student-welcome">
+            <h2>Welcome to Students Tracker</h2>
+            <p>It was help to understand students situation</p>
+          </div>
 
-            <div class="upload-area" id="uploadArea">
-              <p id="uploadText">Select your file</p>
-              <input type="file" id="fileInput" accept=".pdf,.xlsx,.xls,.csv,image/*">
-            </div>
+          <div class="upload-title">
+            Please select these below options to upload students roll number and name
+          </div>
 
-            <div class="chat-input-area">
-              <input type="text" id="chatInput" placeholder="Type here..." disabled>
-              <button class="chat-send-btn" id="chatSendBtn" disabled>
-                <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
-              </button>
-            </div>
+          <div class="upload-options">
+            <button class="upload-option-btn" id="btnPdf">
+              <span>📄</span> PDF File
+            </button>
+            <button class="upload-option-btn" id="btnExcel">
+              <span>📊</span> Excel File
+            </button>
+            <button class="upload-option-btn" id="btnImage">
+              <span>🖼️</span> Photo / Images
+            </button>
+          </div>
+
+          <div class="file-upload-box" id="fileUploadBox">
+            <p id="fileUploadText">Select your file</p>
+            <input type="file" id="fileInput" accept=".pdf,.xlsx,.xls,.csv,image/*">
+          </div>
+
+          <div class="upload-success" id="uploadSuccess">
+            ✅ File uploaded successfully!
           </div>
         </div>
 
@@ -709,16 +687,16 @@
     const tabProfile = document.getElementById('tabProfile');
     const logoutBtn = document.getElementById('logoutBtn');
 
-    // Chat elements
-    const chatMessages = document.getElementById('chatMessages');
-    const chatInput = document.getElementById('chatInput');
-    const chatSendBtn = document.getElementById('chatSendBtn');
-    const uploadArea = document.getElementById('uploadArea');
-    const uploadText = document.getElementById('uploadText');
+    // Upload elements
+    const btnPdf = document.getElementById('btnPdf');
+    const btnExcel = document.getElementById('btnExcel');
+    const btnImage = document.getElementById('btnImage');
+    const fileUploadBox = document.getElementById('fileUploadBox');
+    const fileUploadText = document.getElementById('fileUploadText');
     const fileInput = document.getElementById('fileInput');
+    const uploadSuccess = document.getElementById('uploadSuccess');
 
     let currentUser = null;
-    let chatStarted = false;
 
     // ========== LOGIN PASSWORD TOGGLE ==========
     togglePassword.addEventListener('click', function () {
@@ -831,8 +809,10 @@
       tabProfile.classList.remove('active');
       appHeader.textContent = "Student";
 
-      // Start chatbot every time Student is clicked
-      startChatbot();
+      // Reset upload UI
+      fileUploadBox.classList.remove('show');
+      uploadSuccess.style.display = 'none';
+      fileInput.value = '';
     }
 
     function showProfile() {
@@ -849,99 +829,38 @@
     tabStudent.addEventListener('click', showStudent);
     tabProfile.addEventListener('click', showProfile);
 
-    // ========== CHATBOT ==========
-    function addBotMessage(text, showOptions = false) {
-      const div = document.createElement('div');
-      div.className = 'bot-msg';
-      div.innerHTML = text;
+    // ========== UPLOAD OPTIONS ==========
+    btnPdf.addEventListener('click', function() {
+      fileUploadText.textContent = 'Select a PDF file';
+      fileInput.accept = '.pdf';
+      fileUploadBox.classList.add('show');
+      uploadSuccess.style.display = 'none';
+    });
 
-      if (showOptions) {
-        const optionsDiv = document.createElement('div');
-        optionsDiv.className = 'chat-options';
-        optionsDiv.innerHTML = `
-          <button class="chat-option-btn" data-type="pdf">📄 PDF File</button>
-          <button class="chat-option-btn" data-type="excel">📊 Excel File</button>
-          <button class="chat-option-btn" data-type="image">🖼️ Image File</button>
-        `;
-        div.appendChild(optionsDiv);
+    btnExcel.addEventListener('click', function() {
+      fileUploadText.textContent = 'Select an Excel / CSV file';
+      fileInput.accept = '.xlsx,.xls,.csv';
+      fileUploadBox.classList.add('show');
+      uploadSuccess.style.display = 'none';
+    });
 
-        optionsDiv.querySelectorAll('.chat-option-btn').forEach(btn => {
-          btn.addEventListener('click', function() {
-            const type = this.getAttribute('data-type');
-            handleUploadChoice(type);
-          });
-        });
-      }
+    btnImage.addEventListener('click', function() {
+      fileUploadText.textContent = 'Select Photo / Image';
+      fileInput.accept = 'image/*';
+      fileUploadBox.classList.add('show');
+      uploadSuccess.style.display = 'none';
+    });
 
-      chatMessages.appendChild(div);
-      chatMessages.scrollTop = chatMessages.scrollHeight;
-    }
-
-    function addUserMessage(text) {
-      const div = document.createElement('div');
-      div.className = 'user-msg';
-      div.textContent = text;
-      chatMessages.appendChild(div);
-      chatMessages.scrollTop = chatMessages.scrollHeight;
-    }
-
-    function startChatbot() {
-      chatMessages.innerHTML = '';
-      uploadArea.classList.remove('show');
-
-      setTimeout(() => {
-        addBotMessage("Hi! 👋 I'm your Student Data Assistant.");
-      }, 300);
-
-      setTimeout(() => {
-        addBotMessage("How would you like to upload students data?", true);
-      }, 900);
-    }
-
-    function handleUploadChoice(type) {
-      let label = '';
-      let accept = '';
-
-      if (type === 'pdf') {
-        label = 'PDF File';
-        accept = '.pdf';
-        uploadText.textContent = 'Select a PDF file';
-      } else if (type === 'excel') {
-        label = 'Excel File';
-        accept = '.xlsx,.xls,.csv';
-        uploadText.textContent = 'Select an Excel / CSV file';
-      } else {
-        label = 'Image File';
-        accept = 'image/*';
-        uploadText.textContent = 'Select an Image file';
-      }
-
-      addUserMessage(label);
-      fileInput.accept = accept;
-      uploadArea.classList.add('show');
-
-      setTimeout(() => {
-        addBotMessage("Please select your " + label + " using the upload box below.");
-      }, 400);
-    }
-
-    // File selected
     fileInput.addEventListener('change', function() {
       if (this.files && this.files[0]) {
-        const fileName = this.files[0].name;
-        addUserMessage("Uploaded: " + fileName);
-        setTimeout(() => {
-          addBotMessage("✅ File received successfully!<br>Processing will be available soon.");
-        }, 600);
-        uploadArea.classList.remove('show');
-        this.value = '';
+        uploadSuccess.style.display = 'block';
+        fileUploadBox.classList.remove('show');
       }
     });
 
     // ========== LOGOUT ==========
     logoutBtn.addEventListener('click', function () {
       currentUser = null;
-      chatStarted = false;
       appScreen.classList.remove('active');
       loginBox.classList.remove('hidden');
       switchBox.classList.remove('hidden');
