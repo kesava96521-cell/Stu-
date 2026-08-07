@@ -77,12 +77,15 @@
 </head>
 <body>
   <div class="container">
+
     <!-- LOGIN -->
     <div class="login-box" id="loginBox">
       <div class="logo">Student Tracker</div>
       <div class="subtitle">Track. Learn. Grow.</div>
       <form id="loginForm">
-        <div class="input-group"><input type="text" id="username" placeholder="Student ID / Roll Number" required></div>
+        <div class="input-group">
+          <input type="text" id="username" placeholder="Student ID / Roll Number" required>
+        </div>
         <div class="input-group password-wrapper">
           <input type="password" id="password" placeholder="Password" required>
           <button type="button" class="eye-btn" id="togglePassword">
@@ -136,24 +139,31 @@
       <a id="switchLink">Create now</a>
     </div>
 
-    <!-- APP SCREEN -->
+    <!-- APP -->
     <div class="app-screen" id="appScreen">
       <div class="app-header" id="appHeader">Home</div>
       <div class="app-content">
-        <!-- HOME -->
+
+        <!-- HOME TAB -->
         <div id="homeTab">
           <div class="home-content">
             <h2>Welcome 👋</h2>
             <p id="welcomeText">You are logged in successfully.</p>
+
             <div class="total-box" id="totalStudentsBox">
               <h3>To see total students</h3>
               <p>Click to view uploaded students list</p>
               <div class="total-count" id="totalCount">0</div>
             </div>
+
             <div class="students-table-box" id="studentsTableBox">
               <table class="students-table">
                 <thead>
-                  <tr><th>S.No</th><th>Roll Number</th><th>Name</th></tr>
+                  <tr>
+                    <th>S.No</th>
+                    <th>Roll Number</th>
+                    <th>Name</th>
+                  </tr>
                 </thead>
                 <tbody id="studentsTableBody"></tbody>
               </table>
@@ -162,7 +172,7 @@
           </div>
         </div>
 
-        <!-- STUDENT -->
+        <!-- STUDENT TAB -->
         <div id="studentTab" class="hidden">
           <div class="student-welcome">
             <h2>Welcome to Students Tracker</h2>
@@ -182,7 +192,7 @@
           <div class="upload-success" id="uploadSuccess"></div>
         </div>
 
-        <!-- PROFILE -->
+        <!-- PROFILE TAB -->
         <div id="profileTab" class="hidden">
           <div class="profile-card">
             <div class="profile-avatar" id="profileAvatar">S</div>
@@ -194,6 +204,7 @@
             <button class="logout-btn" id="logoutBtn">Logout</button>
           </div>
         </div>
+
       </div>
 
       <div class="bottom-tab">
@@ -213,7 +224,7 @@
   <script>
     pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
-    // ========== ELEMENTS ==========
+    // Elements
     const username = document.getElementById('username');
     const password = document.getElementById('password');
     const loginBtn = document.getElementById('loginBtn');
@@ -269,8 +280,8 @@
     let currentUser = null;
     let currentUploadType = '';
 
-    // ========== PASSWORD TOGGLE ==========
-    togglePassword.addEventListener('click', () => {
+    // Password toggle
+    togglePassword.addEventListener('click', function () {
       if (password.type === 'password') {
         password.type = 'text';
         eyeClosed.style.display = 'none';
@@ -283,14 +294,18 @@
     });
 
     function checkInputs() {
-      loginBtn.classList.toggle('active', username.value.trim() && password.value.trim());
+      if (username.value.trim() && password.value.trim()) {
+        loginBtn.classList.add('active');
+      } else {
+        loginBtn.classList.remove('active');
+      }
       errorMsg.style.display = 'none';
     }
     username.addEventListener('input', checkInputs);
     password.addEventListener('input', checkInputs);
 
-    // ========== LOGIN ==========
-    form.addEventListener('submit', e => {
+    // Login
+    form.addEventListener('submit', function (e) {
       e.preventDefault();
       const u = username.value.trim();
       const p = password.value.trim();
@@ -302,8 +317,14 @@
       }
 
       let users = [];
-      try { users = JSON.parse(localStorage.getItem('students') || '[]'); } catch(e) {}
-      const found = users.find(user => String(user.rollNumber).toLowerCase() === u.toLowerCase() && String(user.password) === p);
+      try {
+        users = JSON.parse(localStorage.getItem('students') || '[]');
+      } catch (e) {}
+
+      const found = users.find(function (user) {
+        return String(user.rollNumber).toLowerCase() === u.toLowerCase() && String(user.password) === p;
+      });
+
       if (found) {
         currentUser = found;
         openApp();
@@ -331,7 +352,7 @@
       }
     }
 
-    // ========== TABS ==========
+    // Tabs
     function showHome() {
       homeTab.classList.remove('hidden');
       studentTab.classList.add('hidden');
@@ -342,6 +363,7 @@
       appHeader.textContent = 'Home';
       updateTotalCount();
     }
+
     function showStudent() {
       homeTab.classList.add('hidden');
       studentTab.classList.remove('hidden');
@@ -355,6 +377,7 @@
       processingMsg.style.display = 'none';
       fileInput.value = '';
     }
+
     function showProfile() {
       homeTab.classList.add('hidden');
       studentTab.classList.add('hidden');
@@ -364,20 +387,26 @@
       tabProfile.classList.add('active');
       appHeader.textContent = 'Profile';
     }
+
     tabHome.addEventListener('click', showHome);
     tabStudent.addEventListener('click', showStudent);
     tabProfile.addEventListener('click', showProfile);
 
-    // ========== TOTAL STUDENTS ==========
+    // Total Students + FIXED TABLE RENDER
     function getUploadedStudents() {
-      try { return JSON.parse(localStorage.getItem('uploadedStudents') || '[]'); } catch(e) { return []; }
+      try {
+        return JSON.parse(localStorage.getItem('uploadedStudents') || '[]');
+      } catch (e) {
+        return [];
+      }
     }
+
     function updateTotalCount() {
       totalCount.textContent = getUploadedStudents().length;
     }
 
-    totalStudentsBox.addEventListener('click', () => {
-      const list = getUploadedStudents();
+    totalStudentsBox.addEventListener('click', function () {
+      var list = getUploadedStudents();
       studentsTableBody.innerHTML = '';
 
       if (list.length === 0) {
@@ -387,43 +416,54 @@
       }
 
       noDataMsg.style.display = 'none';
-      list.forEach((stu, index) => {
-        const tr = document.createElement('tr');
-        tr.innerHTML = `<td>\( {index + 1}</td><td> \){stu.rollNumber || '—'}</td><td>${stu.name || '—'}</td>`;
+
+      for (var i = 0; i < list.length; i++) {
+        var stu = list[i];
+        var tr = document.createElement('tr');
+
+        var td1 = document.createElement('td');
+        td1.textContent = (i + 1);
+
+        var td2 = document.createElement('td');
+        td2.textContent = stu.rollNumber || '—';
+
+        var td3 = document.createElement('td');
+        td3.textContent = stu.name || '—';
+
+        tr.appendChild(td1);
+        tr.appendChild(td2);
+        tr.appendChild(td3);
+
         studentsTableBody.appendChild(tr);
-      });
+      }
+
       studentsTableBox.classList.add('show');
     });
 
-    // ========== IMPROVED PARSER ==========
+    // Improved Parser
     function parseTextToStudents(text) {
-      const lines = text
-        .split(/\r?\n/)
-        .map(l => l.trim())
-        .filter(l => l.length > 1);
+      var lines = text.split(/\r?\n/).map(function (l) { return l.trim(); }).filter(function (l) { return l.length > 1; });
+      var students = [];
+      var skipWords = ['regd', 'number', 'name', 'mid', 's.no', 'sno', 'roll', 'student', 'list', 'class', 'section', 'page'];
 
-      const students = [];
-      const skipWords = ['regd', 'number', 'name', 'mid', 's.no', 'sno', 'roll', 'student', 'list', 'class', 'section', 'page'];
-
-      let i = 0;
+      var i = 0;
       while (i < lines.length) {
-        const line = lines[i];
-        const lower = line.toLowerCase();
+        var line = lines[i];
+        var lower = line.toLowerCase();
 
-        // Skip headers
-        if (skipWords.some(w => lower.includes(w))) {
+        if (skipWords.some(function (w) { return lower.indexOf(w) !== -1; })) {
           i++;
           continue;
         }
 
-        // Case 1: Line is pure Roll Number
+        // Pure Roll Number
         if (/^\d{5,}\( /.test(line) || /^[0-9A-Za-z\/\-]{6,} \)/.test(line)) {
-          const roll = line;
-          let name = '';
+          var roll = line;
+          var name = '';
 
           if (i + 1 < lines.length) {
-            const next = lines[i + 1].trim();
-            if (next && !/^\d{5,}$/.test(next) && !skipWords.some(w => next.toLowerCase().includes(w))) {
+            var next = lines[i + 1].trim();
+            if (next && !/^\d{5,}$/.test(next) && !skipWords.some(function (w) { return next.toLowerCase().indexOf(w) !== -1; })) {
               name = next;
               i += 2;
             } else {
@@ -439,15 +479,15 @@
           continue;
         }
 
-        // Case 2: "RollNumber Name" same line
-        let match = line.match(/^([0-9A-Za-z\/\-]{5,})\s+(.+)$/);
+        // Roll + Name same line
+        var match = line.match(/^([0-9A-Za-z\/\-]{5,})\s+(.+)$/);
         if (match) {
           students.push({ rollNumber: match[1].trim(), name: match[2].trim() });
           i++;
           continue;
         }
 
-        // Case 3: "Name RollNumber"
+        // Name + Roll
         match = line.match(/^([A-Za-z\s\.]+)\s+([0-9A-Za-z\/\-]{5,})$/);
         if (match) {
           students.push({ rollNumber: match[2].trim(), name: match[1].trim() });
@@ -468,8 +508,8 @@
       return true;
     }
 
-    // ========== UPLOAD BUTTONS ==========
-    btnPdf.addEventListener('click', () => {
+    // Upload buttons
+    btnPdf.addEventListener('click', function () {
       currentUploadType = 'pdf';
       fileUploadText.textContent = 'Select a PDF file';
       fileInput.accept = '.pdf';
@@ -477,7 +517,8 @@
       uploadSuccess.style.display = 'none';
       processingMsg.style.display = 'none';
     });
-    btnExcel.addEventListener('click', () => {
+
+    btnExcel.addEventListener('click', function () {
       currentUploadType = 'excel';
       fileUploadText.textContent = 'Select an Excel / CSV file';
       fileInput.accept = '.xlsx,.xls,.csv';
@@ -485,7 +526,8 @@
       uploadSuccess.style.display = 'none';
       processingMsg.style.display = 'none';
     });
-    btnImage.addEventListener('click', () => {
+
+    btnImage.addEventListener('click', function () {
       currentUploadType = 'image';
       fileUploadText.textContent = 'Select Photo / Image';
       fileInput.accept = 'image/*';
@@ -494,33 +536,33 @@
       processingMsg.style.display = 'none';
     });
 
-    // ========== FILE PROCESSING ==========
+    // File processing
     fileInput.addEventListener('change', async function () {
       if (!this.files || !this.files[0]) return;
-      const file = this.files[0];
+      var file = this.files[0];
 
       processingMsg.style.display = 'block';
       uploadSuccess.style.display = 'none';
       fileUploadBox.classList.remove('show');
 
       try {
-        let studentsList = [];
+        var studentsList = [];
 
         if (currentUploadType === 'excel') {
-          const data = await file.arrayBuffer();
-          const workbook = XLSX.read(new Uint8Array(data), { type: 'array' });
-          const sheet = workbook.Sheets[workbook.SheetNames[0]];
-          const json = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+          var data = await file.arrayBuffer();
+          var workbook = XLSX.read(new Uint8Array(data), { type: 'array' });
+          var sheet = workbook.Sheets[workbook.SheetNames[0]];
+          var json = XLSX.utils.sheet_to_json(sheet, { header: 1 });
 
           if (json.length > 1) {
-            const headers = json[0].map(h => String(h || '').toLowerCase());
-            let rollIdx = headers.findIndex(h => h.includes('roll'));
-            let nameIdx = headers.findIndex(h => h.includes('name'));
+            var headers = json[0].map(function (h) { return String(h || '').toLowerCase(); });
+            var rollIdx = headers.findIndex(function (h) { return h.indexOf('roll') !== -1; });
+            var nameIdx = headers.findIndex(function (h) { return h.indexOf('name') !== -1; });
             if (rollIdx === -1) rollIdx = 0;
             if (nameIdx === -1) nameIdx = 1;
 
-            for (let i = 1; i < json.length; i++) {
-              const row = json[i];
+            for (var i = 1; i < json.length; i++) {
+              var row = json[i];
               if (row && (row[rollIdx] || row[nameIdx])) {
                 studentsList.push({
                   rollNumber: String(row[rollIdx] || '').trim(),
@@ -529,23 +571,23 @@
               }
             }
           }
-        } 
+        }
         else if (currentUploadType === 'pdf') {
-          const buffer = await file.arrayBuffer();
-          const pdf = await pdfjsLib.getDocument({ data: buffer }).promise;
-          let fullText = '';
-          for (let i = 1; i <= pdf.numPages; i++) {
-            const page = await pdf.getPage(i);
-            const content = await page.getTextContent();
-            fullText += content.items.map(item => item.str).join(' ') + '\n';
+          var buffer = await file.arrayBuffer();
+          var pdf = await pdfjsLib.getDocument({ data: buffer }).promise;
+          var fullText = '';
+          for (var p = 1; p <= pdf.numPages; p++) {
+            var page = await pdf.getPage(p);
+            var content = await page.getTextContent();
+            fullText += content.items.map(function (item) { return item.str; }).join(' ') + '\n';
           }
           studentsList = parseTextToStudents(fullText);
-        } 
+        }
         else if (currentUploadType === 'image') {
-          const result = await Tesseract.recognize(file, 'eng', {
-            logger: m => {
+          var result = await Tesseract.recognize(file, 'eng', {
+            logger: function (m) {
               if (m.status === 'recognizing text') {
-                processingMsg.textContent = `OCR Progress: ${Math.round(m.progress * 100)}%`;
+                processingMsg.textContent = 'OCR Progress: ' + Math.round(m.progress * 100) + '%';
               }
             }
           });
@@ -555,7 +597,7 @@
         if (saveStudents(studentsList)) {
           uploadSuccess.style.display = 'block';
           uploadSuccess.style.color = '#2e7d32';
-          uploadSuccess.textContent = `✅ ${studentsList.length} students extracted & saved!`;
+          uploadSuccess.textContent = '✅ ' + studentsList.length + ' students extracted & saved!';
         } else {
           uploadSuccess.style.display = 'block';
           uploadSuccess.style.color = '#d32f2f';
@@ -572,8 +614,8 @@
       this.value = '';
     });
 
-    // ========== LOGOUT ==========
-    logoutBtn.addEventListener('click', () => {
+    // Logout
+    logoutBtn.addEventListener('click', function () {
       currentUser = null;
       appScreen.classList.remove('active');
       loginBox.classList.remove('hidden');
@@ -584,8 +626,8 @@
       errorMsg.style.display = 'none';
     });
 
-    // ========== SWITCH ==========
-    switchLink.addEventListener('click', () => {
+    // Switch
+    switchLink.addEventListener('click', function () {
       if (isLogin) {
         loginBox.classList.add('hidden');
         registerBox.classList.remove('hidden');
@@ -603,13 +645,14 @@
       registerSuccess.style.display = 'none';
     });
 
-    // ========== REGISTER TOGGLES ==========
+    // Register password toggles
     function setupToggle(inputId, btnId, closedId, openId) {
-      const input = document.getElementById(inputId);
-      const btn = document.getElementById(btnId);
-      const closed = document.getElementById(closedId);
-      const open = document.getElementById(openId);
-      btn.addEventListener('click', () => {
+      var input = document.getElementById(inputId);
+      var btn = document.getElementById(btnId);
+      var closed = document.getElementById(closedId);
+      var open = document.getElementById(openId);
+
+      btn.addEventListener('click', function () {
         if (input.type === 'password') {
           input.type = 'text';
           closed.style.display = 'none';
@@ -625,16 +668,20 @@
     setupToggle('confirmPassword', 'confirmTogglePassword', 'confirmEyeClosed', 'confirmEyeOpen');
 
     function checkRegisterInputs() {
-      submitBtn.classList.toggle('active',
-        collegeName.value.trim() && studentName.value.trim() && rollNumber.value.trim() &&
-        groupName.value.trim() && regPassword.value.trim() && confirmPassword.value.trim()
-      );
+      if (collegeName.value.trim() && studentName.value.trim() && rollNumber.value.trim() &&
+          groupName.value.trim() && regPassword.value.trim() && confirmPassword.value.trim()) {
+        submitBtn.classList.add('active');
+      } else {
+        submitBtn.classList.remove('active');
+      }
       registerError.style.display = 'none';
     }
-    [collegeName, studentName, rollNumber, groupName, regPassword, confirmPassword].forEach(el => el.addEventListener('input', checkRegisterInputs));
+    [collegeName, studentName, rollNumber, groupName, regPassword, confirmPassword].forEach(function (el) {
+      el.addEventListener('input', checkRegisterInputs);
+    });
 
-    // ========== REGISTER SUBMIT ==========
-    registerForm.addEventListener('submit', e => {
+    // Register submit
+    registerForm.addEventListener('submit', function (e) {
       e.preventDefault();
       registerError.style.display = 'none';
       registerSuccess.style.display = 'none';
@@ -645,6 +692,7 @@
         registerError.style.display = 'block';
         return;
       }
+
       if (regPassword.value !== confirmPassword.value) {
         registerError.textContent = 'Password and Confirm Password do not match.';
         registerError.style.display = 'block';
@@ -652,12 +700,15 @@
       }
 
       try {
-        let users = JSON.parse(localStorage.getItem('students') || '[]');
-        if (users.some(u => String(u.rollNumber).toLowerCase() === rollNumber.value.trim().toLowerCase())) {
+        var users = JSON.parse(localStorage.getItem('students') || '[]');
+        if (users.some(function (u) {
+          return String(u.rollNumber).toLowerCase() === rollNumber.value.trim().toLowerCase();
+        })) {
           registerError.textContent = 'This Roll Number is already registered.';
           registerError.style.display = 'block';
           return;
         }
+
         users.push({
           collegeName: collegeName.value.trim(),
           studentName: studentName.value.trim(),
@@ -665,10 +716,11 @@
           group: groupName.value.trim(),
           password: regPassword.value.trim()
         });
+
         localStorage.setItem('students', JSON.stringify(users));
         registerSuccess.style.display = 'block';
 
-        setTimeout(() => {
+        setTimeout(function () {
           registerBox.classList.add('hidden');
           loginBox.classList.remove('hidden');
           switchText.textContent = "Don't have an account? ";
