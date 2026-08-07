@@ -5,6 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Student Tracker</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <!-- PDF.js -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+  <!-- Tesseract.js for Image OCR -->
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
   <style>
     * {
       margin: 0;
@@ -535,6 +539,14 @@
       font-size: 14px;
       display: none;
     }
+
+    .processing {
+      margin-top: 12px;
+      text-align: center;
+      color: #1a237e;
+      font-size: 13px;
+      display: none;
+    }
   </style>
 </head>
 <body>
@@ -652,14 +664,12 @@
             <h2>Welcome 👋</h2>
             <p id="welcomeText">You are logged in successfully.</p>
 
-            <!-- Total Students Box -->
             <div class="total-box" id="totalStudentsBox">
               <h3>To see total students</h3>
               <p>Click to view uploaded students list</p>
               <div class="total-count" id="totalCount">0</div>
             </div>
 
-            <!-- Students Table (hidden by default) -->
             <div class="students-table-box" id="studentsTableBox">
               <table class="students-table">
                 <thead>
@@ -669,8 +679,7 @@
                     <th>Name</th>
                   </tr>
                 </thead>
-                <tbody id="studentsTableBody">
-                </tbody>
+                <tbody id="studentsTableBody"></tbody>
               </table>
               <div class="no-data" id="noDataMsg" style="display:none;">No students data uploaded yet</div>
             </div>
@@ -705,6 +714,7 @@
             <input type="file" id="fileInput" accept=".pdf,.xlsx,.xls,.csv,image/*">
           </div>
 
+          <div class="processing" id="processingMsg">Processing... Please wait</div>
           <div class="upload-success" id="uploadSuccess">
             ✅ File uploaded & saved successfully!
           </div>
@@ -755,6 +765,9 @@
   </div>
 
   <script>
+    // PDF.js worker
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
     // ========== ELEMENTS ==========
     const username = document.getElementById('username');
     const password = document.getElementById('password');
@@ -783,7 +796,6 @@
     const registerError = document.getElementById('registerError');
     const registerSuccess = document.getElementById('registerSuccess');
 
-    // App elements
     const appScreen = document.getElementById('appScreen');
     const appHeader = document.getElementById('appHeader');
     const homeTab = document.getElementById('homeTab');
@@ -794,7 +806,6 @@
     const tabProfile = document.getElementById('tabProfile');
     const logoutBtn = document.getElementById('logoutBtn');
 
-    // Upload elements
     const btnPdf = document.getElementById('btnPdf');
     const btnExcel = document.getElementById('btnExcel');
     const btnImage = document.getElementById('btnImage');
@@ -802,8 +813,8 @@
     const fileUploadText = document.getElementById('fileUploadText');
     const fileInput = document.getElementById('fileInput');
     const uploadSuccess = document.getElementById('uploadSuccess');
+    const processingMsg = document.getElementById('processingMsg');
 
-    // Home table elements
     const totalStudentsBox = document.getElementById('totalStudentsBox');
     const totalCount = document.getElementById('totalCount');
     const studentsTableBox = document.getElementById('studentsTableBox');
@@ -843,32 +854,21 @@
     // ========== LOGIN SUBMIT ==========
     form.addEventListener('submit', function(e) {
       e.preventDefault();
-
       const u = username.value.trim();
       const p = password.value.trim();
 
       if (u === "admin" && p === "1234") {
         errorMsg.style.display = 'none';
-        currentUser = {
-          studentName: "Admin",
-          rollNumber: "admin",
-          collegeName: "Admin Panel",
-          group: "—"
-        };
+        currentUser = { studentName: "Admin", rollNumber: "admin", collegeName: "Admin Panel", group: "—" };
         openApp();
         return;
       }
 
       let users = [];
-      try {
-        users = JSON.parse(localStorage.getItem('students') || '[]');
-      } catch (err) {
-        users = [];
-      }
+      try { users = JSON.parse(localStorage.getItem('students') || '[]'); } catch (err) { users = []; }
 
       const found = users.find(user => 
-        String(user.rollNumber).toLowerCase() === u.toLowerCase() && 
-        String(user.password) === p
+        String(user.rollNumber).toLowerCase() === u.toLowerCase() && String(user.password) === p
       );
 
       if (found) {
@@ -880,28 +880,22 @@
       }
     });
 
-    // ========== OPEN APP AFTER LOGIN ==========
     function openApp() {
       loginBox.classList.add('hidden');
       registerBox.classList.add('hidden');
       switchBox.classList.add('hidden');
       appScreen.classList.add('active');
-
       showHome();
       updateTotalCount();
 
       if (currentUser) {
-        document.getElementById('welcomeText').textContent = 
-          "Welcome, " + currentUser.studentName + "!";
-
+        document.getElementById('welcomeText').textContent = "Welcome, " + currentUser.studentName + "!";
         document.getElementById('profileName').textContent = currentUser.studentName || "—";
         document.getElementById('profileRoll').textContent = currentUser.rollNumber || "—";
         document.getElementById('profileCollege').textContent = currentUser.collegeName || "—";
         document.getElementById('profileGroup').textContent = currentUser.group || "—";
         document.getElementById('profileRoll2').textContent = currentUser.rollNumber || "—";
-
-        const firstLetter = (currentUser.studentName || "S").charAt(0).toUpperCase();
-        document.getElementById('profileAvatar').textContent = firstLetter;
+        document.getElementById('profileAvatar').textContent = (currentUser.studentName || "S").charAt(0).toUpperCase();
       }
     }
 
@@ -925,9 +919,9 @@
       tabStudent.classList.add('active');
       tabProfile.classList.remove('active');
       appHeader.textContent = "Student";
-
       fileUploadBox.classList.remove('show');
       uploadSuccess.style.display = 'none';
+      processingMsg.style.display = 'none';
       fileInput.value = '';
     }
 
@@ -947,16 +941,12 @@
 
     // ========== HOME - TOTAL STUDENTS ==========
     function getUploadedStudents() {
-      try {
-        return JSON.parse(localStorage.getItem('uploadedStudents') || '[]');
-      } catch (e) {
-        return [];
-      }
+      try { return JSON.parse(localStorage.getItem('uploadedStudents') || '[]'); } 
+      catch (e) { return []; }
     }
 
     function updateTotalCount() {
-      const list = getUploadedStudents();
-      totalCount.textContent = list.length;
+      totalCount.textContent = getUploadedStudents().length;
     }
 
     totalStudentsBox.addEventListener('click', function() {
@@ -972,15 +962,39 @@
       noDataMsg.style.display = 'none';
       list.forEach((stu, index) => {
         const tr = document.createElement('tr');
-        tr.innerHTML = `
-          <td>${index + 1}</td>
-          <td>${stu.rollNumber || '—'}</td>
-          <td>${stu.name || '—'}</td>
-        `;
+        tr.innerHTML = `<td>\( {index + 1}</td><td> \){stu.rollNumber || '—'}</td><td>${stu.name || '—'}</td>`;
         studentsTableBody.appendChild(tr);
       });
       studentsTableBox.classList.add('show');
     });
+
+    // ========== HELPER: Parse text into students ==========
+    function parseTextToStudents(text) {
+      const lines = text.split(/\r?\n/).map(l => l.trim()).filter(l => l.length > 2);
+      const students = [];
+
+      lines.forEach(line => {
+        // Common patterns: "RollNo Name" or "Name - RollNo" or "RollNo, Name"
+        let match = line.match(/([A-Za-z0-9\/\-]+)\s+([A-Za-z\s\.]+)/);
+        if (match) {
+          students.push({ rollNumber: match[1].trim(), name: match[2].trim() });
+          return;
+        }
+        match = line.match(/([A-Za-z\s\.]+)\s*[-–,]\s*([A-Za-z0-9\/\-]+)/);
+        if (match) {
+          students.push({ rollNumber: match[2].trim(), name: match[1].trim() });
+        }
+      });
+
+      return students;
+    }
+
+    function saveStudents(list) {
+      if (list.length === 0) return false;
+      localStorage.setItem('uploadedStudents', JSON.stringify(list));
+      updateTotalCount();
+      return true;
+    }
 
     // ========== UPLOAD OPTIONS ==========
     btnPdf.addEventListener('click', function() {
@@ -989,6 +1003,7 @@
       fileInput.accept = '.pdf';
       fileUploadBox.classList.add('show');
       uploadSuccess.style.display = 'none';
+      processingMsg.style.display = 'none';
     });
 
     btnExcel.addEventListener('click', function() {
@@ -997,6 +1012,7 @@
       fileInput.accept = '.xlsx,.xls,.csv';
       fileUploadBox.classList.add('show');
       uploadSuccess.style.display = 'none';
+      processingMsg.style.display = 'none';
     });
 
     btnImage.addEventListener('click', function() {
@@ -1005,66 +1021,89 @@
       fileInput.accept = 'image/*';
       fileUploadBox.classList.add('show');
       uploadSuccess.style.display = 'none';
+      processingMsg.style.display = 'none';
     });
 
-    fileInput.addEventListener('change', function() {
+    // ========== FILE PROCESSING ==========
+    fileInput.addEventListener('change', async function() {
       if (!this.files || !this.files[0]) return;
-
       const file = this.files[0];
 
-      if (currentUploadType === 'excel') {
-        // Parse Excel and save Roll Number + Name
-        const reader = new FileReader();
-        reader.onload = function(e) {
-          try {
-            const data = new Uint8Array(e.target.result);
-            const workbook = XLSX.read(data, { type: 'array' });
-            const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
-            const jsonData = XLSX.utils.sheet_to_json(firstSheet, { header: 1 });
+      processingMsg.style.display = 'block';
+      uploadSuccess.style.display = 'none';
+      fileUploadBox.classList.remove('show');
 
-            // Try to find Roll Number and Name columns
-            let studentsList = [];
-            if (jsonData.length > 1) {
-              // Assume first row is header
-              const headers = jsonData[0].map(h => String(h).toLowerCase());
-              let rollIdx = headers.findIndex(h => h.includes('roll'));
-              let nameIdx = headers.findIndex(h => h.includes('name'));
+      try {
+        let studentsList = [];
 
-              // Fallback if not found
-              if (rollIdx === -1) rollIdx = 0;
-              if (nameIdx === -1) nameIdx = 1;
+        if (currentUploadType === 'excel') {
+          // ===== EXCEL =====
+          const data = await file.arrayBuffer();
+          const workbook = XLSX.read(new Uint8Array(data), { type: 'array' });
+          const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+          const jsonData = XLSX.utils.sheet_to_json(firstSheet, { header: 1 });
 
-              for (let i = 1; i < jsonData.length; i++) {
-                const row = jsonData[i];
-                if (row && (row[rollIdx] || row[nameIdx])) {
-                  studentsList.push({
-                    rollNumber: String(row[rollIdx] || '').trim(),
-                    name: String(row[nameIdx] || '').trim()
-                  });
-                }
+          if (jsonData.length > 1) {
+            const headers = jsonData[0].map(h => String(h || '').toLowerCase());
+            let rollIdx = headers.findIndex(h => h.includes('roll'));
+            let nameIdx = headers.findIndex(h => h.includes('name'));
+            if (rollIdx === -1) rollIdx = 0;
+            if (nameIdx === -1) nameIdx = 1;
+
+            for (let i = 1; i < jsonData.length; i++) {
+              const row = jsonData[i];
+              if (row && (row[rollIdx] || row[nameIdx])) {
+                studentsList.push({
+                  rollNumber: String(row[rollIdx] || '').trim(),
+                  name: String(row[nameIdx] || '').trim()
+                });
               }
             }
-
-            // Save to localStorage (SQL-like)
-            localStorage.setItem('uploadedStudents', JSON.stringify(studentsList));
-            updateTotalCount();
-
-            uploadSuccess.style.display = 'block';
-            uploadSuccess.textContent = `✅ ${studentsList.length} students saved successfully!`;
-            fileUploadBox.classList.remove('show');
-          } catch (err) {
-            alert('Error reading Excel file');
-            console.error(err);
           }
-        };
-        reader.readAsArrayBuffer(file);
-      } else {
-        // PDF or Image - for now just show success (real OCR needs backend)
+        } 
+        else if (currentUploadType === 'pdf') {
+          // ===== PDF =====
+          const arrayBuffer = await file.arrayBuffer();
+          const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+          let fullText = '';
+
+          for (let i = 1; i <= pdf.numPages; i++) {
+            const page = await pdf.getPage(i);
+            const content = await page.getTextContent();
+            const strings = content.items.map(item => item.str);
+            fullText += strings.join(' ') + '\n';
+          }
+          studentsList = parseTextToStudents(fullText);
+        } 
+        else if (currentUploadType === 'image') {
+          // ===== IMAGE (OCR) =====
+          const result = await Tesseract.recognize(file, 'eng', {
+            logger: m => {
+              if (m.status === 'recognizing text') {
+                processingMsg.textContent = `OCR Progress: ${Math.round(m.progress * 100)}%`;
+              }
+            }
+          });
+          studentsList = parseTextToStudents(result.data.text);
+        }
+
+        // Save
+        if (saveStudents(studentsList)) {
+          uploadSuccess.style.display = 'block';
+          uploadSuccess.textContent = `✅ ${studentsList.length} students extracted & saved!`;
+        } else {
+          uploadSuccess.style.display = 'block';
+          uploadSuccess.style.color = '#d32f2f';
+          uploadSuccess.textContent = '⚠️ Could not extract Roll Number & Name. Try clearer file.';
+        }
+      } catch (err) {
+        console.error(err);
         uploadSuccess.style.display = 'block';
-        uploadSuccess.textContent = '✅ File received! (Full extraction needs backend)';
-        fileUploadBox.classList.remove('show');
+        uploadSuccess.style.color = '#d32f2f';
+        uploadSuccess.textContent = '❌ Error processing file. Try again.';
       }
 
+      processingMsg.style.display = 'none';
       this.value = '';
     });
 
@@ -1080,7 +1119,7 @@
       errorMsg.style.display = 'none';
     });
 
-    // ========== SWITCH LOGIN ↔ REGISTER ==========
+    // ========== SWITCH ==========
     switchLink.addEventListener('click', function () {
       if (isLogin) {
         loginBox.classList.add('hidden');
@@ -1100,13 +1139,12 @@
       errorMsg.style.display = 'none';
     });
 
-    // ========== REGISTER PASSWORD TOGGLES ==========
+    // ========== REGISTER TOGGLES ==========
     function setupToggle(inputId, btnId, closedId, openId) {
       const input = document.getElementById(inputId);
       const btn = document.getElementById(btnId);
       const closed = document.getElementById(closedId);
       const open = document.getElementById(openId);
-
       btn.addEventListener('click', function () {
         if (input.type === 'password') {
           input.type = 'text';
@@ -1121,27 +1159,18 @@
         }
       });
     }
-
     setupToggle('regPassword', 'regTogglePassword', 'regEyeClosed', 'regEyeOpen');
     setupToggle('confirmPassword', 'confirmTogglePassword', 'confirmEyeClosed', 'confirmEyeOpen');
 
-    // ========== REGISTER INPUT CHECK ==========
     function checkRegisterInputs() {
-      if (
-        collegeName.value.trim() &&
-        studentName.value.trim() &&
-        rollNumber.value.trim() &&
-        groupName.value.trim() &&
-        regPassword.value.trim() &&
-        confirmPassword.value.trim()
-      ) {
+      if (collegeName.value.trim() && studentName.value.trim() && rollNumber.value.trim() &&
+          groupName.value.trim() && regPassword.value.trim() && confirmPassword.value.trim()) {
         submitBtn.classList.add('active');
       } else {
         submitBtn.classList.remove('active');
       }
       registerError.style.display = 'none';
     }
-
     [collegeName, studentName, rollNumber, groupName, regPassword, confirmPassword].forEach(el => {
       el.addEventListener('input', checkRegisterInputs);
     });
@@ -1149,18 +1178,11 @@
     // ========== REGISTER SUBMIT ==========
     registerForm.addEventListener('submit', function (e) {
       e.preventDefault();
-
       registerError.style.display = 'none';
       registerSuccess.style.display = 'none';
 
-      if (
-        !collegeName.value.trim() ||
-        !studentName.value.trim() ||
-        !rollNumber.value.trim() ||
-        !groupName.value.trim() ||
-        !regPassword.value.trim() ||
-        !confirmPassword.value.trim()
-      ) {
+      if (!collegeName.value.trim() || !studentName.value.trim() || !rollNumber.value.trim() ||
+          !groupName.value.trim() || !regPassword.value.trim() || !confirmPassword.value.trim()) {
         registerError.textContent = 'Please fill all the fields.';
         registerError.style.display = 'block';
         return;
@@ -1174,7 +1196,6 @@
 
       try {
         let users = JSON.parse(localStorage.getItem('students') || '[]');
-
         if (users.some(u => String(u.rollNumber).toLowerCase() === rollNumber.value.trim().toLowerCase())) {
           registerError.textContent = 'This Roll Number is already registered.';
           registerError.style.display = 'block';
@@ -1190,7 +1211,6 @@
         });
 
         localStorage.setItem('students', JSON.stringify(users));
-
         registerSuccess.style.display = 'block';
 
         setTimeout(function () {
@@ -1199,18 +1219,15 @@
           switchText.textContent = "Don't have an account? ";
           switchLink.textContent = 'Create now';
           isLogin = true;
-
           registerForm.reset();
           submitBtn.classList.remove('active');
           registerSuccess.style.display = 'none';
           registerError.style.display = 'none';
           errorMsg.style.display = 'none';
         }, 1500);
-
       } catch (err) {
-        registerError.textContent = 'Save failed. Please try again or check browser settings.';
+        registerError.textContent = 'Save failed. Please try again.';
         registerError.style.display = 'block';
-        console.error('localStorage error:', err);
       }
     });
   </script>
