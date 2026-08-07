@@ -85,7 +85,10 @@
         <div class="input-group"><input type="text" id="username" placeholder="Student ID / Roll Number" required></div>
         <div class="input-group password-wrapper">
           <input type="password" id="password" placeholder="Password" required>
-          <button type="button" class="eye-btn" id="togglePassword"><svg id="eyeClosed" viewBox="0 0 24 24"><path d="M12 7c2.76 0 5 2.24 5 5 0 .65-.13 1.26-.36 1.83l2.92 2.92c1.51-1.26 2.7-2.89 3.43-4.75-1.73-4.39-6-7.5-11-7.5-1.4 0-2.74.25-3.98.7l2.16 2.16C10.74 7.13 11.35 7 12 7zM2 4.27l2.28 2.28.46.46C3.08 8.3 1.78 10.02 1 12c1.73 4.39 6 7.5 11 7.5 1.55 0 3.03-.3 4.38-.84l.42.42L19.73 22 21 20.73 3.27 3 2 4.27zM7.53 9.8l1.55 1.55c-.05.21-.08.43-.08.65 0 1.66 1.34 3 3 3 .22 0 .44-.03.65-.08l1.55 1.55c-.67.33-1.41.53-2.2.53-2.76 0-5-2.24-5-5 0-.79.2-1.53.53-2.2zm4.31-.78l3.15 3.15.02-.16c0-1.66-1.34-3-3-3l-.17.01z"/></svg><svg id="eyeOpen" viewBox="0 0 24 24" style="display:none"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg></button>
+          <button type="button" class="eye-btn" id="togglePassword">
+            <svg id="eyeClosed" viewBox="0 0 24 24"><path d="M12 7c2.76 0 5 2.24 5 5 0 .65-.13 1.26-.36 1.83l2.92 2.92c1.51-1.26 2.7-2.89 3.43-4.75-1.73-4.39-6-7.5-11-7.5-1.4 0-2.74.25-3.98.7l2.16 2.16C10.74 7.13 11.35 7 12 7zM2 4.27l2.28 2.28.46.46C3.08 8.3 1.78 10.02 1 12c1.73 4.39 6 7.5 11 7.5 1.55 0 3.03-.3 4.38-.84l.42.42L19.73 22 21 20.73 3.27 3 2 4.27zM7.53 9.8l1.55 1.55c-.05.21-.08.43-.08.65 0 1.66 1.34 3 3 3 .22 0 .44-.03.65-.08l1.55 1.55c-.67.33-1.41.53-2.2.53-2.76 0-5-2.24-5-5 0-.79.2-1.53.53-2.2zm4.31-.78l3.15 3.15.02-.16c0-1.66-1.34-3-3-3l-.17.01z"/></svg>
+            <svg id="eyeOpen" viewBox="0 0 24 24" style="display:none"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
+          </button>
         </div>
         <button type="submit" class="login-btn" id="loginBtn">Log in</button>
       </form>
@@ -102,20 +105,42 @@
         <div class="input-group"><label>Student Name</label><input type="text" id="studentName" required></div>
         <div class="input-group"><label>Roll Number</label><input type="text" id="rollNumber" required></div>
         <div class="input-group"><label>Group</label><input type="text" id="groupName" required></div>
-        <div class="input-group"><label>Create Password</label><div class="password-wrapper"><input type="password" id="regPassword" required><button type="button" class="eye-btn" id="regTogglePassword"><svg id="regEyeClosed" viewBox="0 0 24 24"><path d="M12 7c2.76 0 5 2.24 5 5 0 .65-.13 1.26-.36 1.83l2.92 2.92c1.51-1.26 2.7-2.89 3.43-4.75-1.73-4.39-6-7.5-11-7.5-1.4 0-2.74.25-3.98.7l2.16 2.16C10.74 7.13 11.35 7 12 7zM2 4.27l2.28 2.28.46.46C3.08 8.3 1.78 10.02 1 12c1.73 4.39 6 7.5 11 7.5 1.55 0 3.03-.3 4.38-.84l.42.42L19.73 22 21 20.73 3.27 3 2 4.27zM7.53 9.8l1.55 1.55c-.05.21-.08.43-.08.65 0 1.66 1.34 3 3 3 .22 0 .44-.03.65-.08l1.55 1.55c-.67.33-1.41.53-2.2.53-2.76 0-5-2.24-5-5 0-.79.2-1.53.53-2.2zm4.31-.78l3.15 3.15.02-.16c0-1.66-1.34-3-3-3l-.17.01z"/></svg><svg id="regEyeOpen" viewBox="0 0 24 24" style="display:none"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg></button></div></div>
-        <div class="input-group"><label>Confirm Password</label><div class="password-wrapper"><input type="password" id="confirmPassword" required><button type="button" class="eye-btn" id="confirmTogglePassword"><svg id="confirmEyeClosed" viewBox="0 0 24 24"><path d="M12 7c2.76 0 5 2.24 5 5 0 .65-.13 1.26-.36 1.83l2.92 2.92c1.51-1.26 2.7-2.89 3.43-4.75-1.73-4.39-6-7.5-11-7.5-1.4 0-2.74.25-3.98.7l2.16 2.16C10.74 7.13 11.35 7 12 7zM2 4.27l2.28 2.28.46.46C3.08 8.3 1.78 10.02 1 12c1.73 4.39 6 7.5 11 7.5 1.55 0 3.03-.3 4.38-.84l.42.42L19.73 22 21 20.73 3.27 3 2 4.27zM7.53 9.8l1.55 1.55c-.05.21-.08.43-.08.65 0 1.66 1.34 3 3 3 .22 0 .44-.03.65-.08l1.55 1.55c-.67.33-1.41.53-2.2.53-2.76 0-5-2.24-5-5 0-.79.2-1.53.53-2.2zm4.31-.78l3.15 3.15.02-.16c0-1.66-1.34-3-3-3l-.17.01z"/></svg><svg id="confirmEyeOpen" viewBox="0 0 24 24" style="display:none"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg></button></div></div>
+        <div class="input-group">
+          <label>Create Password</label>
+          <div class="password-wrapper">
+            <input type="password" id="regPassword" required>
+            <button type="button" class="eye-btn" id="regTogglePassword">
+              <svg id="regEyeClosed" viewBox="0 0 24 24"><path d="M12 7c2.76 0 5 2.24 5 5 0 .65-.13 1.26-.36 1.83l2.92 2.92c1.51-1.26 2.7-2.89 3.43-4.75-1.73-4.39-6-7.5-11-7.5-1.4 0-2.74.25-3.98.7l2.16 2.16C10.74 7.13 11.35 7 12 7zM2 4.27l2.28 2.28.46.46C3.08 8.3 1.78 10.02 1 12c1.73 4.39 6 7.5 11 7.5 1.55 0 3.03-.3 4.38-.84l.42.42L19.73 22 21 20.73 3.27 3 2 4.27zM7.53 9.8l1.55 1.55c-.05.21-.08.43-.08.65 0 1.66 1.34 3 3 3 .22 0 .44-.03.65-.08l1.55 1.55c-.67.33-1.41.53-2.2.53-2.76 0-5-2.24-5-5 0-.79.2-1.53.53-2.2zm4.31-.78l3.15 3.15.02-.16c0-1.66-1.34-3-3-3l-.17.01z"/></svg>
+              <svg id="regEyeOpen" viewBox="0 0 24 24" style="display:none"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
+            </button>
+          </div>
+        </div>
+        <div class="input-group">
+          <label>Confirm Password</label>
+          <div class="password-wrapper">
+            <input type="password" id="confirmPassword" required>
+            <button type="button" class="eye-btn" id="confirmTogglePassword">
+              <svg id="confirmEyeClosed" viewBox="0 0 24 24"><path d="M12 7c2.76 0 5 2.24 5 5 0 .65-.13 1.26-.36 1.83l2.92 2.92c1.51-1.26 2.7-2.89 3.43-4.75-1.73-4.39-6-7.5-11-7.5-1.4 0-2.74.25-3.98.7l2.16 2.16C10.74 7.13 11.35 7 12 7zM2 4.27l2.28 2.28.46.46C3.08 8.3 1.78 10.02 1 12c1.73 4.39 6 7.5 11 7.5 1.55 0 3.03-.3 4.38-.84l.42.42L19.73 22 21 20.73 3.27 3 2 4.27zM7.53 9.8l1.55 1.55c-.05.21-.08.43-.08.65 0 1.66 1.34 3 3 3 .22 0 .44-.03.65-.08l1.55 1.55c-.67.33-1.41.53-2.2.53-2.76 0-5-2.24-5-5 0-.79.2-1.53.53-2.2zm4.31-.78l3.15 3.15.02-.16c0-1.66-1.34-3-3-3l-.17.01z"/></svg>
+              <svg id="confirmEyeOpen" viewBox="0 0 24 24" style="display:none"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
+            </button>
+          </div>
+        </div>
         <button type="submit" class="submit-btn" id="submitBtn">Submit</button>
       </form>
       <p class="error" id="registerError"></p>
       <p class="success" id="registerSuccess">Account created successfully</p>
     </div>
 
-    <div class="signup-box" id="switchBox"><span id="switchText">Don't have an account? </span><a id="switchLink">Create now</a></div>
+    <div class="signup-box" id="switchBox">
+      <span id="switchText">Don't have an account? </span>
+      <a id="switchLink">Create now</a>
+    </div>
 
-    <!-- APP -->
+    <!-- APP SCREEN -->
     <div class="app-screen" id="appScreen">
       <div class="app-header" id="appHeader">Home</div>
       <div class="app-content">
+        <!-- HOME -->
         <div id="homeTab">
           <div class="home-content">
             <h2>Welcome 👋</h2>
@@ -127,7 +152,9 @@
             </div>
             <div class="students-table-box" id="studentsTableBox">
               <table class="students-table">
-                <thead><tr><th>S.No</th><th>Roll Number</th><th>Name</th></tr></thead>
+                <thead>
+                  <tr><th>S.No</th><th>Roll Number</th><th>Name</th></tr>
+                </thead>
                 <tbody id="studentsTableBody"></tbody>
               </table>
               <div class="no-data" id="noDataMsg" style="display:none">No students data uploaded yet</div>
@@ -135,6 +162,7 @@
           </div>
         </div>
 
+        <!-- STUDENT -->
         <div id="studentTab" class="hidden">
           <div class="student-welcome">
             <h2>Welcome to Students Tracker</h2>
@@ -154,6 +182,7 @@
           <div class="upload-success" id="uploadSuccess"></div>
         </div>
 
+        <!-- PROFILE -->
         <div id="profileTab" class="hidden">
           <div class="profile-card">
             <div class="profile-avatar" id="profileAvatar">S</div>
@@ -168,9 +197,15 @@
       </div>
 
       <div class="bottom-tab">
-        <button class="tab-btn active" id="tabHome"><svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>Home</button>
-        <button class="tab-btn" id="tabStudent"><svg viewBox="0 0 24 24"><path d="M5 13.18v4L12 21l7-3.82v-4L12 17l-7-3.82zM12 3L1 9l11 6 9-4.91V17h2V9L12 3z"/></svg>Student</button>
-        <button class="tab-btn" id="tabProfile"><svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>Profile</button>
+        <button class="tab-btn active" id="tabHome">
+          <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>Home
+        </button>
+        <button class="tab-btn" id="tabStudent">
+          <svg viewBox="0 0 24 24"><path d="M5 13.18v4L12 21l7-3.82v-4L12 17l-7-3.82zM12 3L1 9l11 6 9-4.91V17h2V9L12 3z"/></svg>Student
+        </button>
+        <button class="tab-btn" id="tabProfile">
+          <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>Profile
+        </button>
       </div>
     </div>
   </div>
@@ -178,7 +213,7 @@
   <script>
     pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
-    // Elements
+    // ========== ELEMENTS ==========
     const username = document.getElementById('username');
     const password = document.getElementById('password');
     const loginBtn = document.getElementById('loginBtn');
@@ -234,7 +269,7 @@
     let currentUser = null;
     let currentUploadType = '';
 
-    // Password toggle
+    // ========== PASSWORD TOGGLE ==========
     togglePassword.addEventListener('click', () => {
       if (password.type === 'password') {
         password.type = 'text';
@@ -254,7 +289,7 @@
     username.addEventListener('input', checkInputs);
     password.addEventListener('input', checkInputs);
 
-    // Login
+    // ========== LOGIN ==========
     form.addEventListener('submit', e => {
       e.preventDefault();
       const u = username.value.trim();
@@ -296,7 +331,7 @@
       }
     }
 
-    // Tabs
+    // ========== TABS ==========
     function showHome() {
       homeTab.classList.remove('hidden');
       studentTab.classList.add('hidden');
@@ -333,7 +368,7 @@
     tabStudent.addEventListener('click', showStudent);
     tabProfile.addEventListener('click', showProfile);
 
-    // Total Students
+    // ========== TOTAL STUDENTS ==========
     function getUploadedStudents() {
       try { return JSON.parse(localStorage.getItem('uploadedStudents') || '[]'); } catch(e) { return []; }
     }
@@ -360,43 +395,68 @@
       studentsTableBox.classList.add('show');
     });
 
-    // Better text parser
+    // ========== IMPROVED PARSER ==========
     function parseTextToStudents(text) {
-      const lines = text.split(/\r?\n/).map(l => l.trim()).filter(l => l.length > 3);
+      const lines = text
+        .split(/\r?\n/)
+        .map(l => l.trim())
+        .filter(l => l.length > 1);
+
       const students = [];
-      const skipWords = ['roll', 'number', 'name', 's.no', 'sno', 'regd', 'student', 'list', 'class', 'section'];
+      const skipWords = ['regd', 'number', 'name', 'mid', 's.no', 'sno', 'roll', 'student', 'list', 'class', 'section', 'page'];
 
-      lines.forEach(line => {
-        // Skip header-like lines
+      let i = 0;
+      while (i < lines.length) {
+        const line = lines[i];
         const lower = line.toLowerCase();
-        if (skipWords.some(w => lower.includes(w) && lower.split(' ').length < 5)) return;
 
-        // Pattern 1: RollNo   Name
-        let match = line.match(/^([A-Za-z0-9\/\-\.]+)\s{2,}([A-Za-z\s\.]+)$/);
+        // Skip headers
+        if (skipWords.some(w => lower.includes(w))) {
+          i++;
+          continue;
+        }
+
+        // Case 1: Line is pure Roll Number
+        if (/^\d{5,}\( /.test(line) || /^[0-9A-Za-z\/\-]{6,} \)/.test(line)) {
+          const roll = line;
+          let name = '';
+
+          if (i + 1 < lines.length) {
+            const next = lines[i + 1].trim();
+            if (next && !/^\d{5,}$/.test(next) && !skipWords.some(w => next.toLowerCase().includes(w))) {
+              name = next;
+              i += 2;
+            } else {
+              i++;
+            }
+          } else {
+            i++;
+          }
+
+          if (roll) {
+            students.push({ rollNumber: roll, name: name || '—' });
+          }
+          continue;
+        }
+
+        // Case 2: "RollNumber Name" same line
+        let match = line.match(/^([0-9A-Za-z\/\-]{5,})\s+(.+)$/);
         if (match) {
           students.push({ rollNumber: match[1].trim(), name: match[2].trim() });
-          return;
+          i++;
+          continue;
         }
 
-        // Pattern 2: Name - RollNo or Name, RollNo
-        match = line.match(/^([A-Za-z\s\.]+)\s*[-–,]\s*([A-Za-z0-9\/\-\.]+)$/);
+        // Case 3: "Name RollNumber"
+        match = line.match(/^([A-Za-z\s\.]+)\s+([0-9A-Za-z\/\-]{5,})$/);
         if (match) {
           students.push({ rollNumber: match[2].trim(), name: match[1].trim() });
-          return;
+          i++;
+          continue;
         }
 
-        // Pattern 3: simple two parts
-        const parts = line.split(/\s{2,}|\t/);
-        if (parts.length >= 2) {
-          const p1 = parts[0].trim();
-          const p2 = parts.slice(1).join(' ').trim();
-          if (/[0-9]/.test(p1) && /[A-Za-z]/.test(p2)) {
-            students.push({ rollNumber: p1, name: p2 });
-          } else if (/[0-9]/.test(p2) && /[A-Za-z]/.test(p1)) {
-            students.push({ rollNumber: p2, name: p1 });
-          }
-        }
-      });
+        i++;
+      }
 
       return students;
     }
@@ -408,7 +468,7 @@
       return true;
     }
 
-    // Upload buttons
+    // ========== UPLOAD BUTTONS ==========
     btnPdf.addEventListener('click', () => {
       currentUploadType = 'pdf';
       fileUploadText.textContent = 'Select a PDF file';
@@ -434,8 +494,8 @@
       processingMsg.style.display = 'none';
     });
 
-    // File processing
-    fileInput.addEventListener('change', async function() {
+    // ========== FILE PROCESSING ==========
+    fileInput.addEventListener('change', async function () {
       if (!this.files || !this.files[0]) return;
       const file = this.files[0];
 
@@ -499,7 +559,7 @@
         } else {
           uploadSuccess.style.display = 'block';
           uploadSuccess.style.color = '#d32f2f';
-          uploadSuccess.textContent = '⚠️ Could not extract clean Roll Number & Name. Try clearer file.';
+          uploadSuccess.textContent = '⚠️ Could not extract clean data. Try clearer file.';
         }
       } catch (err) {
         console.error(err);
@@ -512,7 +572,7 @@
       this.value = '';
     });
 
-    // Logout
+    // ========== LOGOUT ==========
     logoutBtn.addEventListener('click', () => {
       currentUser = null;
       appScreen.classList.remove('active');
@@ -524,7 +584,7 @@
       errorMsg.style.display = 'none';
     });
 
-    // Switch login/register
+    // ========== SWITCH ==========
     switchLink.addEventListener('click', () => {
       if (isLogin) {
         loginBox.classList.add('hidden');
@@ -543,7 +603,7 @@
       registerSuccess.style.display = 'none';
     });
 
-    // Register toggles
+    // ========== REGISTER TOGGLES ==========
     function setupToggle(inputId, btnId, closedId, openId) {
       const input = document.getElementById(inputId);
       const btn = document.getElementById(btnId);
@@ -573,6 +633,7 @@
     }
     [collegeName, studentName, rollNumber, groupName, regPassword, confirmPassword].forEach(el => el.addEventListener('input', checkRegisterInputs));
 
+    // ========== REGISTER SUBMIT ==========
     registerForm.addEventListener('submit', e => {
       e.preventDefault();
       registerError.style.display = 'none';
