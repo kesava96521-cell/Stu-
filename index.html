@@ -5,770 +5,180 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Student Tracker</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-  <!-- PDF.js -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
-  <!-- Tesseract.js for Image OCR -->
   <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    }
-
-    body {
-      background: #f0f2f5;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
-    }
-
-    .container {
-      width: 100%;
-      max-width: 380px;
-      padding: 20px;
-    }
-
-    .login-box, .register-box {
-      background: white;
-      border: 1px solid #e0e0e0;
-      border-radius: 12px;
-      padding: 40px 35px 25px;
-      text-align: center;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-    }
-
-    .logo {
-      font-size: 32px;
-      font-weight: 700;
-      margin-bottom: 8px;
-      color: #1a237e;
-      letter-spacing: -0.5px;
-    }
-
-    .subtitle {
-      font-size: 14px;
-      color: #666;
-      margin-bottom: 28px;
-    }
-
-    .input-group {
-      margin-bottom: 12px;
-      position: relative;
-      text-align: left;
-    }
-
-    .input-group label {
-      display: block;
-      font-size: 13px;
-      font-weight: 500;
-      color: #333;
-      margin-bottom: 5px;
-    }
-
-    input {
-      width: 100%;
-      padding: 13px 14px;
-      border: 1.5px solid #ddd;
-      border-radius: 8px;
-      background: #fafafa;
-      font-size: 14px;
-      outline: none;
-      transition: 0.2s;
-    }
-
-    input:focus {
-      border-color: #1a237e;
-      background: white;
-    }
-
-    .password-wrapper {
-      position: relative;
-    }
-
-    .password-wrapper input {
-      padding-right: 48px;
-    }
-
-    .eye-btn {
-      position: absolute;
-      right: 12px;
-      top: 50%;
-      transform: translateY(-50%);
-      background: none;
-      border: none;
-      cursor: pointer;
-      padding: 4px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #666;
-      transition: color 0.2s;
-    }
-
-    .eye-btn:hover {
-      color: #1a237e;
-    }
-
-    .eye-btn svg {
-      width: 22px;
-      height: 22px;
-      fill: currentColor;
-    }
-
-    .login-btn, .submit-btn {
-      width: 100%;
-      background: #1a237e;
-      color: white;
-      border: none;
-      border-radius: 8px;
-      padding: 12px;
-      font-weight: 600;
-      font-size: 15px;
-      margin-top: 10px;
-      cursor: pointer;
-      opacity: 0.65;
-      transition: 0.25s;
-    }
-
-    .login-btn:hover, .submit-btn:hover {
-      background: #0d1757;
-    }
-
-    .login-btn.active, .submit-btn.active {
-      opacity: 1;
-    }
-
-    .or-divider {
-      display: flex;
-      align-items: center;
-      margin: 22px 0;
-      color: #999;
-      font-size: 13px;
-      font-weight: 600;
-    }
-
-    .or-divider::before,
-    .or-divider::after {
-      content: "";
-      flex: 1;
-      height: 1px;
-      background: #e0e0e0;
-    }
-
-    .or-divider span {
-      padding: 0 16px;
-    }
-
-    .signup-box {
-      background: white;
-      border: 1px solid #e0e0e0;
-      border-radius: 12px;
-      padding: 18px;
-      text-align: center;
-      margin-top: 14px;
-      font-size: 14px;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-    }
-
-    .signup-box a {
-      color: #1a237e;
-      font-weight: 600;
-      text-decoration: none;
-      cursor: pointer;
-    }
-
-    .error {
-      color: #d32f2f;
-      font-size: 13px;
-      margin-top: 12px;
-      display: none;
-    }
-
-    .success {
-      color: #2e7d32;
-      font-size: 14px;
-      font-weight: 600;
-      margin-top: 12px;
-      display: none;
-    }
-
-    .hidden {
-      display: none !important;
-    }
-
-    /* ========== APP SCREEN ========== */
-    .app-screen {
-      display: none;
-      width: 100%;
-      max-width: 380px;
-      height: 100vh;
-      max-height: 700px;
-      background: #f0f2f5;
-      border-radius: 16px;
-      overflow: hidden;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-      position: relative;
-      flex-direction: column;
-    }
-
-    .app-screen.active {
-      display: flex;
-    }
-
-    .app-header {
-      background: #1a237e;
-      color: white;
-      padding: 18px 20px;
-      font-size: 18px;
-      font-weight: 600;
-      text-align: center;
-    }
-
-    .app-content {
-      flex: 1;
-      overflow-y: auto;
-      padding: 20px;
-      padding-bottom: 80px;
-    }
-
-    .home-content {
-      text-align: center;
-      padding-top: 30px;
-      color: #555;
-    }
-
-    .home-content h2 {
-      color: #1a237e;
-      margin-bottom: 10px;
-    }
-
-    /* Total Students Box */
-    .total-box {
-      background: white;
-      border-radius: 14px;
-      padding: 22px 18px;
-      margin-top: 25px;
-      box-shadow: 0 2px 12px rgba(0,0,0,0.06);
-      cursor: pointer;
-      border: 1.5px solid #e8eaf6;
-      transition: 0.2s;
-    }
-
-    .total-box:hover {
-      border-color: #1a237e;
-      background: #f8f9ff;
-    }
-
-    .total-box h3 {
-      color: #1a237e;
-      font-size: 16px;
-      margin-bottom: 6px;
-    }
-
-    .total-box p {
-      color: #666;
-      font-size: 13px;
-    }
-
-    .total-count {
-      font-size: 28px;
-      font-weight: 700;
-      color: #1a237e;
-      margin-top: 8px;
-    }
-
-    /* Students Table */
-    .students-table-box {
-      display: none;
-      margin-top: 20px;
-    }
-
-    .students-table-box.show {
-      display: block;
-    }
-
-    .students-table {
-      width: 100%;
-      border-collapse: collapse;
-      background: white;
-      border-radius: 12px;
-      overflow: hidden;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-      font-size: 13px;
-    }
-
-    .students-table th {
-      background: #1a237e;
-      color: white;
-      padding: 12px 10px;
-      text-align: left;
-      font-weight: 600;
-    }
-
-    .students-table td {
-      padding: 11px 10px;
-      border-bottom: 1px solid #f0f0f0;
-      color: #333;
-    }
-
-    .students-table tr:last-child td {
-      border-bottom: none;
-    }
-
-    .students-table tr:nth-child(even) {
-      background: #fafafa;
-    }
-
-    .no-data {
-      text-align: center;
-      color: #999;
-      padding: 30px 10px;
-      font-size: 14px;
-    }
-
-    /* Profile Card */
-    .profile-card {
-      background: white;
-      border-radius: 14px;
-      padding: 24px 20px;
-      box-shadow: 0 2px 12px rgba(0,0,0,0.06);
-    }
-
-    .profile-avatar {
-      width: 80px;
-      height: 80px;
-      background: #1a237e;
-      color: white;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 32px;
-      font-weight: 700;
-      margin: 0 auto 16px;
-    }
-
-    .profile-name {
-      text-align: center;
-      font-size: 20px;
-      font-weight: 700;
-      color: #1a237e;
-      margin-bottom: 4px;
-    }
-
-    .profile-roll {
-      text-align: center;
-      font-size: 14px;
-      color: #666;
-      margin-bottom: 22px;
-    }
-
-    .detail-row {
-      display: flex;
-      justify-content: space-between;
-      padding: 12px 0;
-      border-bottom: 1px solid #f0f0f0;
-      font-size: 14px;
-    }
-
-    .detail-row:last-child {
-      border-bottom: none;
-    }
-
-    .detail-label {
-      color: #888;
-      font-weight: 500;
-    }
-
-    .detail-value {
-      color: #222;
-      font-weight: 600;
-      text-align: right;
-      max-width: 60%;
-    }
-
-    .logout-btn {
-      width: 100%;
-      margin-top: 24px;
-      background: #fff;
-      color: #d32f2f;
-      border: 1.5px solid #d32f2f;
-      border-radius: 8px;
-      padding: 12px;
-      font-weight: 600;
-      font-size: 15px;
-      cursor: pointer;
-    }
-
-    .logout-btn:hover {
-      background: #ffebee;
-    }
-
-    /* Bottom Tab Bar */
-    .bottom-tab {
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      height: 64px;
-      background: white;
-      border-top: 1px solid #e0e0e0;
-      display: flex;
-      justify-content: space-around;
-      align-items: center;
-      box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
-    }
-
-    .tab-btn {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 4px;
-      background: none;
-      border: none;
-      cursor: pointer;
-      color: #999;
-      font-size: 11px;
-      font-weight: 500;
-      padding: 8px 0;
-      transition: 0.2s;
-    }
-
-    .tab-btn.active {
-      color: #1a237e;
-    }
-
-    .tab-btn svg {
-      width: 24px;
-      height: 24px;
-      fill: currentColor;
-    }
-
-    /* ========== STUDENT UPLOAD SCREEN ========== */
-    .student-welcome {
-      text-align: center;
-      padding-top: 20px;
-    }
-
-    .student-welcome h2 {
-      color: #1a237e;
-      font-size: 22px;
-      margin-bottom: 8px;
-    }
-
-    .student-welcome p {
-      color: #666;
-      font-size: 14px;
-      margin-bottom: 28px;
-      line-height: 1.5;
-    }
-
-    .upload-title {
-      text-align: center;
-      font-size: 15px;
-      font-weight: 600;
-      color: #333;
-      margin-bottom: 18px;
-    }
-
-    .upload-options {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-
-    .upload-option-btn {
-      background: white;
-      border: 1.5px solid #e0e0e0;
-      border-radius: 12px;
-      padding: 16px 18px;
-      font-size: 15px;
-      font-weight: 600;
-      color: #1a237e;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      transition: 0.2s;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-    }
-
-    .upload-option-btn:hover {
-      border-color: #1a237e;
-      background: #f5f7ff;
-    }
-
-    .upload-option-btn span {
-      font-size: 22px;
-    }
-
-    .file-upload-box {
-      margin-top: 20px;
-      padding: 18px;
-      border: 2px dashed #c5cae9;
-      border-radius: 12px;
-      text-align: center;
-      background: #f8f9ff;
-      display: none;
-    }
-
-    .file-upload-box.show {
-      display: block;
-    }
-
-    .file-upload-box p {
-      font-size: 13px;
-      color: #555;
-      margin-bottom: 12px;
-    }
-
-    .file-upload-box input[type="file"] {
-      font-size: 13px;
-    }
-
-    .upload-success {
-      margin-top: 16px;
-      text-align: center;
-      color: #2e7d32;
-      font-weight: 600;
-      font-size: 14px;
-      display: none;
-    }
-
-    .processing {
-      margin-top: 12px;
-      text-align: center;
-      color: #1a237e;
-      font-size: 13px;
-      display: none;
-    }
+    *{margin:0;padding:0;box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+    body{background:#f0f2f5;display:flex;justify-content:center;align-items:center;min-height:100vh}
+    .container{width:100%;max-width:380px;padding:20px}
+    .login-box,.register-box{background:white;border:1px solid #e0e0e0;border-radius:12px;padding:40px 35px 25px;text-align:center;box-shadow:0 4px 20px rgba(0,0,0,.08)}
+    .logo{font-size:32px;font-weight:700;margin-bottom:8px;color:#1a237e}
+    .subtitle{font-size:14px;color:#666;margin-bottom:28px}
+    .input-group{margin-bottom:12px;text-align:left}
+    .input-group label{display:block;font-size:13px;font-weight:500;color:#333;margin-bottom:5px}
+    input{width:100%;padding:13px 14px;border:1.5px solid #ddd;border-radius:8px;background:#fafafa;font-size:14px;outline:none}
+    input:focus{border-color:#1a237e;background:white}
+    .password-wrapper{position:relative}
+    .password-wrapper input{padding-right:48px}
+    .eye-btn{position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#666}
+    .eye-btn svg{width:22px;height:22px;fill:currentColor}
+    .login-btn,.submit-btn{width:100%;background:#1a237e;color:white;border:none;border-radius:8px;padding:12px;font-weight:600;font-size:15px;margin-top:10px;cursor:pointer;opacity:.65}
+    .login-btn.active,.submit-btn.active{opacity:1}
+    .or-divider{display:flex;align-items:center;margin:22px 0;color:#999;font-size:13px;font-weight:600}
+    .or-divider::before,.or-divider::after{content:"";flex:1;height:1px;background:#e0e0e0}
+    .or-divider span{padding:0 16px}
+    .signup-box{background:white;border:1px solid #e0e0e0;border-radius:12px;padding:18px;text-align:center;margin-top:14px;font-size:14px}
+    .signup-box a{color:#1a237e;font-weight:600;text-decoration:none;cursor:pointer}
+    .error{color:#d32f2f;font-size:13px;margin-top:12px;display:none}
+    .success{color:#2e7d32;font-size:14px;font-weight:600;margin-top:12px;display:none}
+    .hidden{display:none!important}
+    .app-screen{display:none;width:100%;max-width:380px;height:100vh;max-height:700px;background:#f0f2f5;border-radius:16px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,.1);position:relative;flex-direction:column}
+    .app-screen.active{display:flex}
+    .app-header{background:#1a237e;color:white;padding:18px 20px;font-size:18px;font-weight:600;text-align:center}
+    .app-content{flex:1;overflow-y:auto;padding:20px;padding-bottom:80px}
+    .home-content{text-align:center;padding-top:30px;color:#555}
+    .home-content h2{color:#1a237e;margin-bottom:10px}
+    .total-box{background:white;border-radius:14px;padding:22px 18px;margin-top:25px;box-shadow:0 2px 12px rgba(0,0,0,.06);cursor:pointer;border:1.5px solid #e8eaf6}
+    .total-box h3{color:#1a237e;font-size:16px;margin-bottom:6px}
+    .total-box p{color:#666;font-size:13px}
+    .total-count{font-size:28px;font-weight:700;color:#1a237e;margin-top:8px}
+    .students-table-box{display:none;margin-top:20px}
+    .students-table-box.show{display:block}
+    .students-table{width:100%;border-collapse:collapse;background:white;border-radius:12px;overflow:hidden;box-shadow:0 2px 10px rgba(0,0,0,.05);font-size:13px}
+    .students-table th{background:#1a237e;color:white;padding:12px 10px;text-align:left}
+    .students-table td{padding:11px 10px;border-bottom:1px solid #f0f0f0;color:#333}
+    .students-table tr:nth-child(even){background:#fafafa}
+    .no-data{text-align:center;color:#999;padding:30px 10px;font-size:14px}
+    .profile-card{background:white;border-radius:14px;padding:24px 20px;box-shadow:0 2px 12px rgba(0,0,0,.06)}
+    .profile-avatar{width:80px;height:80px;background:#1a237e;color:white;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:32px;font-weight:700;margin:0 auto 16px}
+    .profile-name{text-align:center;font-size:20px;font-weight:700;color:#1a237e;margin-bottom:4px}
+    .profile-roll{text-align:center;font-size:14px;color:#666;margin-bottom:22px}
+    .detail-row{display:flex;justify-content:space-between;padding:12px 0;border-bottom:1px solid #f0f0f0;font-size:14px}
+    .detail-label{color:#888}
+    .detail-value{color:#222;font-weight:600;text-align:right;max-width:60%}
+    .logout-btn{width:100%;margin-top:24px;background:#fff;color:#d32f2f;border:1.5px solid #d32f2f;border-radius:8px;padding:12px;font-weight:600;font-size:15px;cursor:pointer}
+    .bottom-tab{position:absolute;bottom:0;left:0;right:0;height:64px;background:white;border-top:1px solid #e0e0e0;display:flex;justify-content:space-around;align-items:center}
+    .tab-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;background:none;border:none;cursor:pointer;color:#999;font-size:11px;font-weight:500;padding:8px 0}
+    .tab-btn.active{color:#1a237e}
+    .tab-btn svg{width:24px;height:24px;fill:currentColor}
+    .student-welcome{text-align:center;padding-top:20px}
+    .student-welcome h2{color:#1a237e;font-size:22px;margin-bottom:8px}
+    .student-welcome p{color:#666;font-size:14px;margin-bottom:28px}
+    .upload-title{text-align:center;font-size:15px;font-weight:600;color:#333;margin-bottom:18px}
+    .upload-options{display:flex;flex-direction:column;gap:12px}
+    .upload-option-btn{background:white;border:1.5px solid #e0e0e0;border-radius:12px;padding:16px 18px;font-size:15px;font-weight:600;color:#1a237e;cursor:pointer;display:flex;align-items:center;gap:12px}
+    .upload-option-btn span{font-size:22px}
+    .file-upload-box{margin-top:20px;padding:18px;border:2px dashed #c5cae9;border-radius:12px;text-align:center;background:#f8f9ff;display:none}
+    .file-upload-box.show{display:block}
+    .file-upload-box p{font-size:13px;color:#555;margin-bottom:12px}
+    .upload-success{margin-top:16px;text-align:center;color:#2e7d32;font-weight:600;font-size:14px;display:none}
+    .processing{margin-top:12px;text-align:center;color:#1a237e;font-size:13px;display:none}
   </style>
 </head>
 <body>
   <div class="container">
-
-    <!-- ========== LOGIN BOX ========== -->
+    <!-- LOGIN -->
     <div class="login-box" id="loginBox">
       <div class="logo">Student Tracker</div>
       <div class="subtitle">Track. Learn. Grow.</div>
-
       <form id="loginForm">
-        <div class="input-group">
-          <input type="text" id="username" placeholder="Student ID / Roll Number" required>
-        </div>
-
+        <div class="input-group"><input type="text" id="username" placeholder="Student ID / Roll Number" required></div>
         <div class="input-group password-wrapper">
           <input type="password" id="password" placeholder="Password" required>
-          <button type="button" class="eye-btn" id="togglePassword" title="Show password">
-            <svg id="eyeClosed" viewBox="0 0 24 24">
-              <path d="M12 7c2.76 0 5 2.24 5 5 0 .65-.13 1.26-.36 1.83l2.92 2.92c1.51-1.26 2.7-2.89 3.43-4.75-1.73-4.39-6-7.5-11-7.5-1.4 0-2.74.25-3.98.7l2.16 2.16C10.74 7.13 11.35 7 12 7zM2 4.27l2.28 2.28.46.46C3.08 8.3 1.78 10.02 1 12c1.73 4.39 6 7.5 11 7.5 1.55 0 3.03-.3 4.38-.84l.42.42L19.73 22 21 20.73 3.27 3 2 4.27zM7.53 9.8l1.55 1.55c-.05.21-.08.43-.08.65 0 1.66 1.34 3 3 3 .22 0 .44-.03.65-.08l1.55 1.55c-.67.33-1.41.53-2.2.53-2.76 0-5-2.24-5-5 0-.79.2-1.53.53-2.2zm4.31-.78l3.15 3.15.02-.16c0-1.66-1.34-3-3-3l-.17.01z"/>
-            </svg>
-            <svg id="eyeOpen" viewBox="0 0 24 24" style="display: none;">
-              <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
-            </svg>
-          </button>
+          <button type="button" class="eye-btn" id="togglePassword"><svg id="eyeClosed" viewBox="0 0 24 24"><path d="M12 7c2.76 0 5 2.24 5 5 0 .65-.13 1.26-.36 1.83l2.92 2.92c1.51-1.26 2.7-2.89 3.43-4.75-1.73-4.39-6-7.5-11-7.5-1.4 0-2.74.25-3.98.7l2.16 2.16C10.74 7.13 11.35 7 12 7zM2 4.27l2.28 2.28.46.46C3.08 8.3 1.78 10.02 1 12c1.73 4.39 6 7.5 11 7.5 1.55 0 3.03-.3 4.38-.84l.42.42L19.73 22 21 20.73 3.27 3 2 4.27zM7.53 9.8l1.55 1.55c-.05.21-.08.43-.08.65 0 1.66 1.34 3 3 3 .22 0 .44-.03.65-.08l1.55 1.55c-.67.33-1.41.53-2.2.53-2.76 0-5-2.24-5-5 0-.79.2-1.53.53-2.2zm4.31-.78l3.15 3.15.02-.16c0-1.66-1.34-3-3-3l-.17.01z"/></svg><svg id="eyeOpen" viewBox="0 0 24 24" style="display:none"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg></button>
         </div>
-
         <button type="submit" class="login-btn" id="loginBtn">Log in</button>
       </form>
-
-      <div class="or-divider">
-        <span>OR</span>
-      </div>
-
+      <div class="or-divider"><span>OR</span></div>
       <p class="error" id="errorMsg">Invalid Student ID or Password. Please try again.</p>
     </div>
 
-    <!-- ========== REGISTER BOX ========== -->
+    <!-- REGISTER -->
     <div class="register-box hidden" id="registerBox">
       <div class="logo">Student Tracker</div>
       <div class="subtitle">Create your account</div>
-
       <form id="registerForm">
-        <div class="input-group">
-          <label>College Name</label>
-          <input type="text" id="collegeName" placeholder="Enter college name" required>
-        </div>
-
-        <div class="input-group">
-          <label>Student Name</label>
-          <input type="text" id="studentName" placeholder="Enter your full name" required>
-        </div>
-
-        <div class="input-group">
-          <label>Roll Number</label>
-          <input type="text" id="rollNumber" placeholder="Enter roll number" required>
-        </div>
-
-        <div class="input-group">
-          <label>Group</label>
-          <input type="text" id="groupName" placeholder="Enter your group" required>
-        </div>
-
-        <div class="input-group">
-          <label>Create Password</label>
-          <div class="password-wrapper">
-            <input type="password" id="regPassword" placeholder="Create password" required>
-            <button type="button" class="eye-btn" id="regTogglePassword" title="Show password">
-              <svg id="regEyeClosed" viewBox="0 0 24 24">
-                <path d="M12 7c2.76 0 5 2.24 5 5 0 .65-.13 1.26-.36 1.83l2.92 2.92c1.51-1.26 2.7-2.89 3.43-4.75-1.73-4.39-6-7.5-11-7.5-1.4 0-2.74.25-3.98.7l2.16 2.16C10.74 7.13 11.35 7 12 7zM2 4.27l2.28 2.28.46.46C3.08 8.3 1.78 10.02 1 12c1.73 4.39 6 7.5 11 7.5 1.55 0 3.03-.3 4.38-.84l.42.42L19.73 22 21 20.73 3.27 3 2 4.27zM7.53 9.8l1.55 1.55c-.05.21-.08.43-.08.65 0 1.66 1.34 3 3 3 .22 0 .44-.03.65-.08l1.55 1.55c-.67.33-1.41.53-2.2.53-2.76 0-5-2.24-5-5 0-.79.2-1.53.53-2.2zm4.31-.78l3.15 3.15.02-.16c0-1.66-1.34-3-3-3l-.17.01z"/>
-              </svg>
-              <svg id="regEyeOpen" viewBox="0 0 24 24" style="display: none;">
-                <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
-              </svg>
-            </button>
-          </div>
-        </div>
-
-        <div class="input-group">
-          <label>Confirm Password</label>
-          <div class="password-wrapper">
-            <input type="password" id="confirmPassword" placeholder="Confirm password" required>
-            <button type="button" class="eye-btn" id="confirmTogglePassword" title="Show password">
-              <svg id="confirmEyeClosed" viewBox="0 0 24 24">
-                <path d="M12 7c2.76 0 5 2.24 5 5 0 .65-.13 1.26-.36 1.83l2.92 2.92c1.51-1.26 2.7-2.89 3.43-4.75-1.73-4.39-6-7.5-11-7.5-1.4 0-2.74.25-3.98.7l2.16 2.16C10.74 7.13 11.35 7 12 7zM2 4.27l2.28 2.28.46.46C3.08 8.3 1.78 10.02 1 12c1.73 4.39 6 7.5 11 7.5 1.55 0 3.03-.3 4.38-.84l.42.42L19.73 22 21 20.73 3.27 3 2 4.27zM7.53 9.8l1.55 1.55c-.05.21-.08.43-.08.65 0 1.66 1.34 3 3 3 .22 0 .44-.03.65-.08l1.55 1.55c-.67.33-1.41.53-2.2.53-2.76 0-5-2.24-5-5 0-.79.2-1.53.53-2.2zm4.31-.78l3.15 3.15.02-.16c0-1.66-1.34-3-3-3l-.17.01z"/>
-              </svg>
-              <svg id="confirmEyeOpen" viewBox="0 0 24 24" style="display: none;">
-                <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
-              </svg>
-            </button>
-          </div>
-        </div>
-
+        <div class="input-group"><label>College Name</label><input type="text" id="collegeName" required></div>
+        <div class="input-group"><label>Student Name</label><input type="text" id="studentName" required></div>
+        <div class="input-group"><label>Roll Number</label><input type="text" id="rollNumber" required></div>
+        <div class="input-group"><label>Group</label><input type="text" id="groupName" required></div>
+        <div class="input-group"><label>Create Password</label><div class="password-wrapper"><input type="password" id="regPassword" required><button type="button" class="eye-btn" id="regTogglePassword"><svg id="regEyeClosed" viewBox="0 0 24 24"><path d="M12 7c2.76 0 5 2.24 5 5 0 .65-.13 1.26-.36 1.83l2.92 2.92c1.51-1.26 2.7-2.89 3.43-4.75-1.73-4.39-6-7.5-11-7.5-1.4 0-2.74.25-3.98.7l2.16 2.16C10.74 7.13 11.35 7 12 7zM2 4.27l2.28 2.28.46.46C3.08 8.3 1.78 10.02 1 12c1.73 4.39 6 7.5 11 7.5 1.55 0 3.03-.3 4.38-.84l.42.42L19.73 22 21 20.73 3.27 3 2 4.27zM7.53 9.8l1.55 1.55c-.05.21-.08.43-.08.65 0 1.66 1.34 3 3 3 .22 0 .44-.03.65-.08l1.55 1.55c-.67.33-1.41.53-2.2.53-2.76 0-5-2.24-5-5 0-.79.2-1.53.53-2.2zm4.31-.78l3.15 3.15.02-.16c0-1.66-1.34-3-3-3l-.17.01z"/></svg><svg id="regEyeOpen" viewBox="0 0 24 24" style="display:none"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg></button></div></div>
+        <div class="input-group"><label>Confirm Password</label><div class="password-wrapper"><input type="password" id="confirmPassword" required><button type="button" class="eye-btn" id="confirmTogglePassword"><svg id="confirmEyeClosed" viewBox="0 0 24 24"><path d="M12 7c2.76 0 5 2.24 5 5 0 .65-.13 1.26-.36 1.83l2.92 2.92c1.51-1.26 2.7-2.89 3.43-4.75-1.73-4.39-6-7.5-11-7.5-1.4 0-2.74.25-3.98.7l2.16 2.16C10.74 7.13 11.35 7 12 7zM2 4.27l2.28 2.28.46.46C3.08 8.3 1.78 10.02 1 12c1.73 4.39 6 7.5 11 7.5 1.55 0 3.03-.3 4.38-.84l.42.42L19.73 22 21 20.73 3.27 3 2 4.27zM7.53 9.8l1.55 1.55c-.05.21-.08.43-.08.65 0 1.66 1.34 3 3 3 .22 0 .44-.03.65-.08l1.55 1.55c-.67.33-1.41.53-2.2.53-2.76 0-5-2.24-5-5 0-.79.2-1.53.53-2.2zm4.31-.78l3.15 3.15.02-.16c0-1.66-1.34-3-3-3l-.17.01z"/></svg><svg id="confirmEyeOpen" viewBox="0 0 24 24" style="display:none"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg></button></div></div>
         <button type="submit" class="submit-btn" id="submitBtn">Submit</button>
       </form>
-
       <p class="error" id="registerError"></p>
       <p class="success" id="registerSuccess">Account created successfully</p>
     </div>
 
-    <!-- Switch Box -->
-    <div class="signup-box" id="switchBox">
-      <span id="switchText">Don't have an account? </span>
-      <a id="switchLink">Create now</a>
-    </div>
+    <div class="signup-box" id="switchBox"><span id="switchText">Don't have an account? </span><a id="switchLink">Create now</a></div>
 
-    <!-- ========== APP SCREEN ========== -->
+    <!-- APP -->
     <div class="app-screen" id="appScreen">
       <div class="app-header" id="appHeader">Home</div>
-
       <div class="app-content">
-        <!-- HOME TAB -->
         <div id="homeTab">
           <div class="home-content">
             <h2>Welcome 👋</h2>
             <p id="welcomeText">You are logged in successfully.</p>
-
             <div class="total-box" id="totalStudentsBox">
               <h3>To see total students</h3>
               <p>Click to view uploaded students list</p>
               <div class="total-count" id="totalCount">0</div>
             </div>
-
             <div class="students-table-box" id="studentsTableBox">
               <table class="students-table">
-                <thead>
-                  <tr>
-                    <th>S.No</th>
-                    <th>Roll Number</th>
-                    <th>Name</th>
-                  </tr>
-                </thead>
+                <thead><tr><th>S.No</th><th>Roll Number</th><th>Name</th></tr></thead>
                 <tbody id="studentsTableBody"></tbody>
               </table>
-              <div class="no-data" id="noDataMsg" style="display:none;">No students data uploaded yet</div>
+              <div class="no-data" id="noDataMsg" style="display:none">No students data uploaded yet</div>
             </div>
           </div>
         </div>
 
-        <!-- STUDENT TAB -->
         <div id="studentTab" class="hidden">
           <div class="student-welcome">
             <h2>Welcome to Students Tracker</h2>
             <p>It was help to understand students situation</p>
           </div>
-
-          <div class="upload-title">
-            Please select these below options to upload students roll number and name
-          </div>
-
+          <div class="upload-title">Please select these below options to upload students roll number and name</div>
           <div class="upload-options">
-            <button class="upload-option-btn" id="btnPdf">
-              <span>📄</span> PDF File
-            </button>
-            <button class="upload-option-btn" id="btnExcel">
-              <span>📊</span> Excel File
-            </button>
-            <button class="upload-option-btn" id="btnImage">
-              <span>🖼️</span> Photo / Images
-            </button>
+            <button class="upload-option-btn" id="btnPdf"><span>📄</span> PDF File</button>
+            <button class="upload-option-btn" id="btnExcel"><span>📊</span> Excel File</button>
+            <button class="upload-option-btn" id="btnImage"><span>🖼️</span> Photo / Images</button>
           </div>
-
           <div class="file-upload-box" id="fileUploadBox">
             <p id="fileUploadText">Select your file</p>
             <input type="file" id="fileInput" accept=".pdf,.xlsx,.xls,.csv,image/*">
           </div>
-
           <div class="processing" id="processingMsg">Processing... Please wait</div>
-          <div class="upload-success" id="uploadSuccess">
-            ✅ File uploaded & saved successfully!
-          </div>
+          <div class="upload-success" id="uploadSuccess"></div>
         </div>
 
-        <!-- PROFILE TAB -->
         <div id="profileTab" class="hidden">
           <div class="profile-card">
             <div class="profile-avatar" id="profileAvatar">S</div>
             <div class="profile-name" id="profileName">Student Name</div>
             <div class="profile-roll" id="profileRoll">Roll Number</div>
-
-            <div class="detail-row">
-              <span class="detail-label">College</span>
-              <span class="detail-value" id="profileCollege">—</span>
-            </div>
-            <div class="detail-row">
-              <span class="detail-label">Group</span>
-              <span class="detail-value" id="profileGroup">—</span>
-            </div>
-            <div class="detail-row">
-              <span class="detail-label">Roll Number</span>
-              <span class="detail-value" id="profileRoll2">—</span>
-            </div>
-
+            <div class="detail-row"><span class="detail-label">College</span><span class="detail-value" id="profileCollege">—</span></div>
+            <div class="detail-row"><span class="detail-label">Group</span><span class="detail-value" id="profileGroup">—</span></div>
+            <div class="detail-row"><span class="detail-label">Roll Number</span><span class="detail-value" id="profileRoll2">—</span></div>
             <button class="logout-btn" id="logoutBtn">Logout</button>
           </div>
         </div>
       </div>
 
-      <!-- BOTTOM TAB BAR -->
       <div class="bottom-tab">
-        <button class="tab-btn active" id="tabHome">
-          <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
-          Home
-        </button>
-        <button class="tab-btn" id="tabStudent">
-          <svg viewBox="0 0 24 24"><path d="M5 13.18v4L12 21l7-3.82v-4L12 17l-7-3.82zM12 3L1 9l11 6 9-4.91V17h2V9L12 3z"/></svg>
-          Student
-        </button>
-        <button class="tab-btn" id="tabProfile">
-          <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
-          Profile
-        </button>
+        <button class="tab-btn active" id="tabHome"><svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>Home</button>
+        <button class="tab-btn" id="tabStudent"><svg viewBox="0 0 24 24"><path d="M5 13.18v4L12 21l7-3.82v-4L12 17l-7-3.82zM12 3L1 9l11 6 9-4.91V17h2V9L12 3z"/></svg>Student</button>
+        <button class="tab-btn" id="tabProfile"><svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>Profile</button>
       </div>
     </div>
-
   </div>
 
   <script>
-    // PDF.js worker
     pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
-    // ========== ELEMENTS ==========
+    // Elements
     const username = document.getElementById('username');
     const password = document.getElementById('password');
     const loginBtn = document.getElementById('loginBtn');
@@ -824,55 +234,42 @@
     let currentUser = null;
     let currentUploadType = '';
 
-    // ========== LOGIN PASSWORD TOGGLE ==========
-    togglePassword.addEventListener('click', function () {
+    // Password toggle
+    togglePassword.addEventListener('click', () => {
       if (password.type === 'password') {
         password.type = 'text';
         eyeClosed.style.display = 'none';
         eyeOpen.style.display = 'block';
-        togglePassword.title = 'Hide password';
       } else {
         password.type = 'password';
         eyeClosed.style.display = 'block';
         eyeOpen.style.display = 'none';
-        togglePassword.title = 'Show password';
       }
     });
 
     function checkInputs() {
-      if (username.value.trim() && password.value.trim()) {
-        loginBtn.classList.add('active');
-      } else {
-        loginBtn.classList.remove('active');
-      }
+      loginBtn.classList.toggle('active', username.value.trim() && password.value.trim());
       errorMsg.style.display = 'none';
     }
-
     username.addEventListener('input', checkInputs);
     password.addEventListener('input', checkInputs);
 
-    // ========== LOGIN SUBMIT ==========
-    form.addEventListener('submit', function(e) {
+    // Login
+    form.addEventListener('submit', e => {
       e.preventDefault();
       const u = username.value.trim();
       const p = password.value.trim();
 
-      if (u === "admin" && p === "1234") {
-        errorMsg.style.display = 'none';
-        currentUser = { studentName: "Admin", rollNumber: "admin", collegeName: "Admin Panel", group: "—" };
+      if (u === 'admin' && p === '1234') {
+        currentUser = { studentName: 'Admin', rollNumber: 'admin', collegeName: 'Admin Panel', group: '—' };
         openApp();
         return;
       }
 
       let users = [];
-      try { users = JSON.parse(localStorage.getItem('students') || '[]'); } catch (err) { users = []; }
-
-      const found = users.find(user => 
-        String(user.rollNumber).toLowerCase() === u.toLowerCase() && String(user.password) === p
-      );
-
+      try { users = JSON.parse(localStorage.getItem('students') || '[]'); } catch(e) {}
+      const found = users.find(user => String(user.rollNumber).toLowerCase() === u.toLowerCase() && String(user.password) === p);
       if (found) {
-        errorMsg.style.display = 'none';
         currentUser = found;
         openApp();
       } else {
@@ -889,17 +286,17 @@
       updateTotalCount();
 
       if (currentUser) {
-        document.getElementById('welcomeText').textContent = "Welcome, " + currentUser.studentName + "!";
-        document.getElementById('profileName').textContent = currentUser.studentName || "—";
-        document.getElementById('profileRoll').textContent = currentUser.rollNumber || "—";
-        document.getElementById('profileCollege').textContent = currentUser.collegeName || "—";
-        document.getElementById('profileGroup').textContent = currentUser.group || "—";
-        document.getElementById('profileRoll2').textContent = currentUser.rollNumber || "—";
-        document.getElementById('profileAvatar').textContent = (currentUser.studentName || "S").charAt(0).toUpperCase();
+        document.getElementById('welcomeText').textContent = 'Welcome, ' + currentUser.studentName + '!';
+        document.getElementById('profileName').textContent = currentUser.studentName || '—';
+        document.getElementById('profileRoll').textContent = currentUser.rollNumber || '—';
+        document.getElementById('profileCollege').textContent = currentUser.collegeName || '—';
+        document.getElementById('profileGroup').textContent = currentUser.group || '—';
+        document.getElementById('profileRoll2').textContent = currentUser.rollNumber || '—';
+        document.getElementById('profileAvatar').textContent = (currentUser.studentName || 'S').charAt(0).toUpperCase();
       }
     }
 
-    // ========== TAB SWITCHING ==========
+    // Tabs
     function showHome() {
       homeTab.classList.remove('hidden');
       studentTab.classList.add('hidden');
@@ -907,10 +304,9 @@
       tabHome.classList.add('active');
       tabStudent.classList.remove('active');
       tabProfile.classList.remove('active');
-      appHeader.textContent = "Home";
+      appHeader.textContent = 'Home';
       updateTotalCount();
     }
-
     function showStudent() {
       homeTab.classList.add('hidden');
       studentTab.classList.remove('hidden');
@@ -918,13 +314,12 @@
       tabHome.classList.remove('active');
       tabStudent.classList.add('active');
       tabProfile.classList.remove('active');
-      appHeader.textContent = "Student";
+      appHeader.textContent = 'Student';
       fileUploadBox.classList.remove('show');
       uploadSuccess.style.display = 'none';
       processingMsg.style.display = 'none';
       fileInput.value = '';
     }
-
     function showProfile() {
       homeTab.classList.add('hidden');
       studentTab.classList.add('hidden');
@@ -932,24 +327,21 @@
       tabHome.classList.remove('active');
       tabStudent.classList.remove('active');
       tabProfile.classList.add('active');
-      appHeader.textContent = "Profile";
+      appHeader.textContent = 'Profile';
     }
-
     tabHome.addEventListener('click', showHome);
     tabStudent.addEventListener('click', showStudent);
     tabProfile.addEventListener('click', showProfile);
 
-    // ========== HOME - TOTAL STUDENTS ==========
+    // Total Students
     function getUploadedStudents() {
-      try { return JSON.parse(localStorage.getItem('uploadedStudents') || '[]'); } 
-      catch (e) { return []; }
+      try { return JSON.parse(localStorage.getItem('uploadedStudents') || '[]'); } catch(e) { return []; }
     }
-
     function updateTotalCount() {
       totalCount.textContent = getUploadedStudents().length;
     }
 
-    totalStudentsBox.addEventListener('click', function() {
+    totalStudentsBox.addEventListener('click', () => {
       const list = getUploadedStudents();
       studentsTableBody.innerHTML = '';
 
@@ -968,21 +360,41 @@
       studentsTableBox.classList.add('show');
     });
 
-    // ========== HELPER: Parse text into students ==========
+    // Better text parser
     function parseTextToStudents(text) {
-      const lines = text.split(/\r?\n/).map(l => l.trim()).filter(l => l.length > 2);
+      const lines = text.split(/\r?\n/).map(l => l.trim()).filter(l => l.length > 3);
       const students = [];
+      const skipWords = ['roll', 'number', 'name', 's.no', 'sno', 'regd', 'student', 'list', 'class', 'section'];
 
       lines.forEach(line => {
-        // Common patterns: "RollNo Name" or "Name - RollNo" or "RollNo, Name"
-        let match = line.match(/([A-Za-z0-9\/\-]+)\s+([A-Za-z\s\.]+)/);
+        // Skip header-like lines
+        const lower = line.toLowerCase();
+        if (skipWords.some(w => lower.includes(w) && lower.split(' ').length < 5)) return;
+
+        // Pattern 1: RollNo   Name
+        let match = line.match(/^([A-Za-z0-9\/\-\.]+)\s{2,}([A-Za-z\s\.]+)$/);
         if (match) {
           students.push({ rollNumber: match[1].trim(), name: match[2].trim() });
           return;
         }
-        match = line.match(/([A-Za-z\s\.]+)\s*[-–,]\s*([A-Za-z0-9\/\-]+)/);
+
+        // Pattern 2: Name - RollNo or Name, RollNo
+        match = line.match(/^([A-Za-z\s\.]+)\s*[-–,]\s*([A-Za-z0-9\/\-\.]+)$/);
         if (match) {
           students.push({ rollNumber: match[2].trim(), name: match[1].trim() });
+          return;
+        }
+
+        // Pattern 3: simple two parts
+        const parts = line.split(/\s{2,}|\t/);
+        if (parts.length >= 2) {
+          const p1 = parts[0].trim();
+          const p2 = parts.slice(1).join(' ').trim();
+          if (/[0-9]/.test(p1) && /[A-Za-z]/.test(p2)) {
+            students.push({ rollNumber: p1, name: p2 });
+          } else if (/[0-9]/.test(p2) && /[A-Za-z]/.test(p1)) {
+            students.push({ rollNumber: p2, name: p1 });
+          }
         }
       });
 
@@ -990,14 +402,14 @@
     }
 
     function saveStudents(list) {
-      if (list.length === 0) return false;
+      if (!list || list.length === 0) return false;
       localStorage.setItem('uploadedStudents', JSON.stringify(list));
       updateTotalCount();
       return true;
     }
 
-    // ========== UPLOAD OPTIONS ==========
-    btnPdf.addEventListener('click', function() {
+    // Upload buttons
+    btnPdf.addEventListener('click', () => {
       currentUploadType = 'pdf';
       fileUploadText.textContent = 'Select a PDF file';
       fileInput.accept = '.pdf';
@@ -1005,8 +417,7 @@
       uploadSuccess.style.display = 'none';
       processingMsg.style.display = 'none';
     });
-
-    btnExcel.addEventListener('click', function() {
+    btnExcel.addEventListener('click', () => {
       currentUploadType = 'excel';
       fileUploadText.textContent = 'Select an Excel / CSV file';
       fileInput.accept = '.xlsx,.xls,.csv';
@@ -1014,8 +425,7 @@
       uploadSuccess.style.display = 'none';
       processingMsg.style.display = 'none';
     });
-
-    btnImage.addEventListener('click', function() {
+    btnImage.addEventListener('click', () => {
       currentUploadType = 'image';
       fileUploadText.textContent = 'Select Photo / Image';
       fileInput.accept = 'image/*';
@@ -1024,7 +434,7 @@
       processingMsg.style.display = 'none';
     });
 
-    // ========== FILE PROCESSING ==========
+    // File processing
     fileInput.addEventListener('change', async function() {
       if (!this.files || !this.files[0]) return;
       const file = this.files[0];
@@ -1037,21 +447,20 @@
         let studentsList = [];
 
         if (currentUploadType === 'excel') {
-          // ===== EXCEL =====
           const data = await file.arrayBuffer();
           const workbook = XLSX.read(new Uint8Array(data), { type: 'array' });
-          const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
-          const jsonData = XLSX.utils.sheet_to_json(firstSheet, { header: 1 });
+          const sheet = workbook.Sheets[workbook.SheetNames[0]];
+          const json = XLSX.utils.sheet_to_json(sheet, { header: 1 });
 
-          if (jsonData.length > 1) {
-            const headers = jsonData[0].map(h => String(h || '').toLowerCase());
+          if (json.length > 1) {
+            const headers = json[0].map(h => String(h || '').toLowerCase());
             let rollIdx = headers.findIndex(h => h.includes('roll'));
             let nameIdx = headers.findIndex(h => h.includes('name'));
             if (rollIdx === -1) rollIdx = 0;
             if (nameIdx === -1) nameIdx = 1;
 
-            for (let i = 1; i < jsonData.length; i++) {
-              const row = jsonData[i];
+            for (let i = 1; i < json.length; i++) {
+              const row = json[i];
               if (row && (row[rollIdx] || row[nameIdx])) {
                 studentsList.push({
                   rollNumber: String(row[rollIdx] || '').trim(),
@@ -1062,21 +471,17 @@
           }
         } 
         else if (currentUploadType === 'pdf') {
-          // ===== PDF =====
-          const arrayBuffer = await file.arrayBuffer();
-          const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+          const buffer = await file.arrayBuffer();
+          const pdf = await pdfjsLib.getDocument({ data: buffer }).promise;
           let fullText = '';
-
           for (let i = 1; i <= pdf.numPages; i++) {
             const page = await pdf.getPage(i);
             const content = await page.getTextContent();
-            const strings = content.items.map(item => item.str);
-            fullText += strings.join(' ') + '\n';
+            fullText += content.items.map(item => item.str).join(' ') + '\n';
           }
           studentsList = parseTextToStudents(fullText);
         } 
         else if (currentUploadType === 'image') {
-          // ===== IMAGE (OCR) =====
           const result = await Tesseract.recognize(file, 'eng', {
             logger: m => {
               if (m.status === 'recognizing text') {
@@ -1087,40 +492,40 @@
           studentsList = parseTextToStudents(result.data.text);
         }
 
-        // Save
         if (saveStudents(studentsList)) {
           uploadSuccess.style.display = 'block';
+          uploadSuccess.style.color = '#2e7d32';
           uploadSuccess.textContent = `✅ ${studentsList.length} students extracted & saved!`;
         } else {
           uploadSuccess.style.display = 'block';
           uploadSuccess.style.color = '#d32f2f';
-          uploadSuccess.textContent = '⚠️ Could not extract Roll Number & Name. Try clearer file.';
+          uploadSuccess.textContent = '⚠️ Could not extract clean Roll Number & Name. Try clearer file.';
         }
       } catch (err) {
         console.error(err);
         uploadSuccess.style.display = 'block';
         uploadSuccess.style.color = '#d32f2f';
-        uploadSuccess.textContent = '❌ Error processing file. Try again.';
+        uploadSuccess.textContent = '❌ Error processing file.';
       }
 
       processingMsg.style.display = 'none';
       this.value = '';
     });
 
-    // ========== LOGOUT ==========
-    logoutBtn.addEventListener('click', function () {
+    // Logout
+    logoutBtn.addEventListener('click', () => {
       currentUser = null;
       appScreen.classList.remove('active');
       loginBox.classList.remove('hidden');
       switchBox.classList.remove('hidden');
-      username.value = "";
-      password.value = "";
+      username.value = '';
+      password.value = '';
       loginBtn.classList.remove('active');
       errorMsg.style.display = 'none';
     });
 
-    // ========== SWITCH ==========
-    switchLink.addEventListener('click', function () {
+    // Switch login/register
+    switchLink.addEventListener('click', () => {
       if (isLogin) {
         loginBox.classList.add('hidden');
         registerBox.classList.remove('hidden');
@@ -1136,26 +541,23 @@
       }
       registerError.style.display = 'none';
       registerSuccess.style.display = 'none';
-      errorMsg.style.display = 'none';
     });
 
-    // ========== REGISTER TOGGLES ==========
+    // Register toggles
     function setupToggle(inputId, btnId, closedId, openId) {
       const input = document.getElementById(inputId);
       const btn = document.getElementById(btnId);
       const closed = document.getElementById(closedId);
       const open = document.getElementById(openId);
-      btn.addEventListener('click', function () {
+      btn.addEventListener('click', () => {
         if (input.type === 'password') {
           input.type = 'text';
           closed.style.display = 'none';
           open.style.display = 'block';
-          btn.title = 'Hide password';
         } else {
           input.type = 'password';
           closed.style.display = 'block';
           open.style.display = 'none';
-          btn.title = 'Show password';
         }
       });
     }
@@ -1163,20 +565,15 @@
     setupToggle('confirmPassword', 'confirmTogglePassword', 'confirmEyeClosed', 'confirmEyeOpen');
 
     function checkRegisterInputs() {
-      if (collegeName.value.trim() && studentName.value.trim() && rollNumber.value.trim() &&
-          groupName.value.trim() && regPassword.value.trim() && confirmPassword.value.trim()) {
-        submitBtn.classList.add('active');
-      } else {
-        submitBtn.classList.remove('active');
-      }
+      submitBtn.classList.toggle('active',
+        collegeName.value.trim() && studentName.value.trim() && rollNumber.value.trim() &&
+        groupName.value.trim() && regPassword.value.trim() && confirmPassword.value.trim()
+      );
       registerError.style.display = 'none';
     }
-    [collegeName, studentName, rollNumber, groupName, regPassword, confirmPassword].forEach(el => {
-      el.addEventListener('input', checkRegisterInputs);
-    });
+    [collegeName, studentName, rollNumber, groupName, regPassword, confirmPassword].forEach(el => el.addEventListener('input', checkRegisterInputs));
 
-    // ========== REGISTER SUBMIT ==========
-    registerForm.addEventListener('submit', function (e) {
+    registerForm.addEventListener('submit', e => {
       e.preventDefault();
       registerError.style.display = 'none';
       registerSuccess.style.display = 'none';
@@ -1187,7 +584,6 @@
         registerError.style.display = 'block';
         return;
       }
-
       if (regPassword.value !== confirmPassword.value) {
         registerError.textContent = 'Password and Confirm Password do not match.';
         registerError.style.display = 'block';
@@ -1201,7 +597,6 @@
           registerError.style.display = 'block';
           return;
         }
-
         users.push({
           collegeName: collegeName.value.trim(),
           studentName: studentName.value.trim(),
@@ -1209,11 +604,10 @@
           group: groupName.value.trim(),
           password: regPassword.value.trim()
         });
-
         localStorage.setItem('students', JSON.stringify(users));
         registerSuccess.style.display = 'block';
 
-        setTimeout(function () {
+        setTimeout(() => {
           registerBox.classList.add('hidden');
           loginBox.classList.remove('hidden');
           switchText.textContent = "Don't have an account? ";
@@ -1222,11 +616,9 @@
           registerForm.reset();
           submitBtn.classList.remove('active');
           registerSuccess.style.display = 'none';
-          registerError.style.display = 'none';
-          errorMsg.style.display = 'none';
         }, 1500);
       } catch (err) {
-        registerError.textContent = 'Save failed. Please try again.';
+        registerError.textContent = 'Save failed.';
         registerError.style.display = 'block';
       }
     });
